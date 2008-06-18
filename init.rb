@@ -1,17 +1,16 @@
 if GC.respond_to?(:enable_stats)
   GC.enable_stats
+  require 'trashed/measurement'
 
-  # Log resource growth per request.
-  # Disable GC during request handling.
-  require 'trashed/request_measurement'
-  require 'trashed/without_gc'
   class ActionController::Dispatcher
-    include Trashed::RequestMeasurement
-    include Trashed::WithoutGc
-  end
+    # Disable GC during request handling.
+    before_dispatch { GC.disable }
+    after_dispatch  { GC.enable }
 
-  # Enable NewRelic live objects sampler
-  #require 'trashed/newrelic_sampler' if defined?(::RPM_AGENT_ENABLED) && ::RPM_AGENT_ENABLED
+    # Log resource growth per request.
+    before_dispatch { Trashed::Measurement.mark! }
+    after_dispatch  { Trashed::Measurement.delta.log! }
+  end
 
   Rails.logger.info '*** Resource growth measurements enabled (running patched ruby) ***'
 else
