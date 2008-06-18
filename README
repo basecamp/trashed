@@ -1,0 +1,13 @@
+Patch ruby with the ruby186gc.patch linked on
+  http://rubyforge.org/tracker/index.php?func=detail&aid=17676&group_id=1814&atid=7062
+
+The controller around_filter measures resource growth per request:
+  * elapsed time
+  * memory growth
+  * object count
+  * garbage collection runs
+  * garbage collection duration
+
+Log info begins with "STATS: "
+
+If you're running NewRelic RPM, a live object count sampler is enabled also.
