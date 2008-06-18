@@ -1,18 +1,23 @@
-if GC.respond_to?(:enable_stats)
-  GC.enable_stats
-  require 'trashed/measurement'
+require 'action_controller/dispatcher'
+require 'trashed/measurement'
 
-  class ActionController::Dispatcher
-    # Disable GC during request handling.
-    #before_dispatch { GC.disable }
-    #after_dispatch  { GC.enable }
+has_adymo = GC.respond_to?(:enable_stats)
+has_lloyd = GC.respond_to?(:heap_info)
 
-    # Log resource growth per request.
-    before_dispatch { Trashed::Measurement.mark! }
-    after_dispatch  { Trashed::Measurement.delta.log! }
+if has_adymo || has_lloyd
+  if has_adymo
+    GC.enable_stats
+    Trashed::Measurement = Trashed::AdymoMeasurement
+    Rails.logger.info 'STATS: time, memory, objects, GC runs, GC time (adymo patch)'
+  else
+    Trashed::Measurement = Trashed::LloydMeasurement
+    Rails.logger.info 'STATS: time, heap size, max heap size, GC runs (lloyd patch)'
   end
 
-  Rails.logger.info '*** Resource growth measurements enabled (running patched ruby) ***'
+  class ActionController::Dispatcher
+    before_dispatch { Trashed::Measurement.mark! }
+    after_dispatch  { Trashed::Measurement.log! }
+  end
 else
   Rails.logger.info '*** Resource growth measurements disabled (running unpatched ruby) ***'
 end
