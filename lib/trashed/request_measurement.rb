@@ -1,23 +1,16 @@
 module Trashed
   module RequestMeasurement
-    LOG_MESSAGE = 'STATS: %s | %s [%s]'.freeze
-
-    def self.included(base)
-      base.send :around_filter, :measure_resource_usage
-    end
-
     protected
-      def measure_resource_usage
+      def handle_request
         before = Measurement.now
-        yield
+        super
       ensure
         change = Measurement.now - before
-        Rails.logger.info(LOG_MESSAGE % [change.to_s,
-          headers['Status'].to_s, (complete_request_uri rescue 'unknown')])
+        Rails.logger.info change.to_s
       end
 
     class Measurement < Struct.new(:time, :memory, :objects, :gc_runs, :gc_time)
-      PP_FORMAT = '%d ms, %.2f KB, %d obj, %d GCs in %d ms'.freeze
+      PP_FORMAT = 'STATS: %d ms, %.2f KB, %d obj, %d GCs in %d ms'.freeze
 
       def self.now
         new(Time.now.to_f,
