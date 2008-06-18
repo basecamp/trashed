@@ -4,8 +4,8 @@ if GC.respond_to?(:enable_stats)
 
   class ActionController::Dispatcher
     # Disable GC during request handling.
-    before_dispatch { GC.disable }
-    after_dispatch  { GC.enable }
+    #before_dispatch { GC.disable }
+    #after_dispatch  { GC.enable }
 
     # Log resource growth per request.
     before_dispatch { Trashed::Measurement.mark! }
