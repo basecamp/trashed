@@ -14,6 +14,7 @@ if has_adymo || has_lloyd
     Rails.logger.info 'STATS: time, heap size, max heap size, GC runs (lloyd patch)'
   end
 
+  Trashed::Measurement.mark!
   class ActionController::Dispatcher
     before_dispatch { Trashed::Measurement.mark! }
     after_dispatch  { Trashed::Measurement.log! }

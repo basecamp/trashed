@@ -13,8 +13,6 @@ module Trashed
       new(Time.now.to_f, GC.allocated_size, ObjectSpace.allocated_objects, GC.collections, GC.time)
     end
 
-    mark!
-
     def -(other)
       self.class.new(time - other.time,
         memory - other.memory, objects - other.objects,
@@ -36,8 +34,6 @@ module Trashed
       info = GC.heap_info
       new(Time.now.to_f, info['heap_current_memory'], info['heap_max_memory'], info['num_gc_passes'])
     end
-
-    mark!
 
     def -(other)
       self.class.new(time - other.time,
