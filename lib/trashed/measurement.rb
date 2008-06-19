@@ -36,9 +36,7 @@ module Trashed
     end
 
     def -(other)
-      self.class.new(time - other.time,
-        memory - other.memory, max_memory,
-        gc_runs - other.gc_runs)
+      self.class.new(time - other.time, memory, max_memory, gc_runs - other.gc_runs)
     end
 
     def to_s
