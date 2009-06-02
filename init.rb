@@ -1,10 +1,9 @@
-require 'action_controller/dispatcher'
 require 'trashed/measurement'
 
 if Trashed.available?
   Trashed.enable
 
-  class ActionController::Dispatcher
+  ActionController::Dispatcher.class_eval do
     before_dispatch { Trashed::Measurement.mark! }
     after_dispatch  { Trashed::Measurement.log! }
   end
