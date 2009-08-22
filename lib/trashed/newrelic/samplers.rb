@@ -1,5 +1,9 @@
 module Trashed
   class Sampler < NewRelic::Agent::Sampler
+    def initialize
+      super self.class::LABEL.sub(/Sampler$/, '').underscore.to_sym
+    end
+
     def poll
       stats.record_data_point(sample)
     end
