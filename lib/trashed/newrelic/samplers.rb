@@ -15,6 +15,10 @@ module Trashed
   end
 
   class PointSampler < Sampler
+    def install!(agent)
+      agent.stats_engine.add_sampler(self) if self.class.available?
+    end
+
     def sample
       measure
     end
@@ -24,6 +28,10 @@ module Trashed
     def initialize
       super
       mark!
+    end
+
+    def install!(agent)
+      agent.stats_engine.add_harvest_sampler(self) if self.class.available?
     end
 
     def sample

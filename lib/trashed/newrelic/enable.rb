@@ -1,7 +1,5 @@
 require 'trashed/newrelic/samplers'
 
-if agent = NewRelic::Agent.instance && agent.respond_to?(:add_sampler)
-  [Trashed::LiveObjectsSampler, Trashed::AllocatedObjectsSampler].each do |sampler|
-    agent.add_sampler(sampler.new) if sampler.available?
-  end
-end
+agent = NewRelic::Agent.instance
+Trashed::LiveObjectsSampler.new.install!(agent)
+Trashed::AllocatedObjectsSampler.new.install!(agent)
