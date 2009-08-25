@@ -31,7 +31,7 @@ module Trashed
 
       TimeTotal = Metric.new('GC/Time/Total', :ms,
         lambda { ::GC.respond_to?(:time) },
-        lambda { (1000 * ::GC.time).ceil })
+        lambda { ::GC.time })
       Time = Change.new('GC/Time', TimeTotal)
 
       MallocTotal = Metric.new('GC/Malloc/Total', :bytes,
