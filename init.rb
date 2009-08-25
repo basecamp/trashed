@@ -1,12 +1,5 @@
-require 'trashed/measurement'
+require 'trashed'
 
-if Trashed.available?
-  Trashed.enable
-
-  ActionController::Dispatcher.class_eval do
-    before_dispatch { Trashed::Measurement.mark! }
-    after_dispatch  { Trashed::Measurement.log! }
-  end
-else
-  Rails.logger.info '*** Resource growth measurements disabled (running unpatched ruby) ***'
-end
+metrics = Trashed::Metrics.available
+message = metrics.any? ? metrics.map(&:label).join(', ') : 'unavailable'
+Rails.logger.info "[Trashed] metrics: #{message}"

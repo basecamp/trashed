@@ -1,13 +1,11 @@
-Patch ruby with the ruby186gc.patch linked on
-  http://rubyforge.org/tracker/index.php?func=detail&aid=17676&group_id=1814&atid=7062
+Trashed keeps an eye on what you throw out for garbage collection.
+Measure object allocations, heap growth, and garbage collection time.
 
-The controller around_filter measures resource growth per request:
-  * elapsed time
-  * memory growth
-  * object count
-  * garbage collection runs
-  * garbage collection duration
+Provides a Rack middleware to log per-request piggishness as well as
+periodic samplers for NewRelic's Rails Performance Monitor.
 
-Log info begins with "STATS: "
+You can also mix and match the Metrics to rig up your own resource
+monitors or provide new Metrics to sample with NewRelic.
 
-If you're running NewRelic RPM, a live object count sampler is enabled also.
+Trashed requires Ruby Enterprise Edition (REE) or a patched Ruby 1.8.
+See http://github.com/skaes/railsbench for patches.

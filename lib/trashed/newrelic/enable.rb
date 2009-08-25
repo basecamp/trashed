@@ -1,5 +1,11 @@
-require 'trashed/newrelic/samplers'
+require 'trashed'
+require 'trashed/newrelic'
 
-agent = NewRelic::Agent.instance
-Trashed::LiveObjectsSampler.new.install!(agent)
-Trashed::AllocatedObjectsSampler.new.install!(agent)
+module Trashed::NewRelic
+  sample 'Objects/Live'
+  sample 'Objects/Allocated'
+
+  sample 'GC/Runs'
+  sample 'GC/Time'
+  sample 'GC/Malloc'
+end
