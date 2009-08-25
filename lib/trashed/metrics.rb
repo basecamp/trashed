@@ -13,13 +13,13 @@ module Trashed
     extend Lookup
 
     module Objects
-      Live = Metric.new('Objects/Live', :objects,
+      Live = Metric.new('Objects/Live', :Kobj,
         lambda { ObjectSpace.respond_to?(:live_objects) },
-        lambda { ObjectSpace.live_objects })
+        lambda { ObjectSpace.live_objects / 1000.0 })
 
-      AllocatedTotal = Metric.new('Objects/Allocated/Total', :objects,
+      AllocatedTotal = Metric.new('Objects/Allocated/Total', :Kobj,
         lambda { ObjectSpace.respond_to?(:allocated_objects) },
-        lambda { ObjectSpace.allocated_objects })
+        lambda { ObjectSpace.allocated_objects / 1000.0 })
       Allocated = Change.new('Objects/Allocated', AllocatedTotal)
     end
 
@@ -29,14 +29,14 @@ module Trashed
         lambda { ::GC.runs })
       Runs = Change.new('GC/Runs', RunsTotal)
 
-      TimeTotal = Metric.new('GC/Time/Total', :ms,
+      TimeTotal = Metric.new('GC/Time/Total', :sec,
         lambda { ::GC.respond_to?(:time) },
-        lambda { ::GC.time })
+        lambda { ::GC.time / 1000.0 })
       Time = Change.new('GC/Time', TimeTotal)
 
       MallocTotal = Metric.new('GC/Malloc/Total', :bytes,
         lambda { ::GC.respond_to?(:allocated_size) },
-        lambda { ::GC.allocated_size })
+        lambda { ::GC.allocated_size / 1024.0 })
       Malloc = Change.new('GC/Malloc', MallocTotal)
     end
 
