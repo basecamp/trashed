@@ -24,10 +24,10 @@ module Trashed
     end
 
     module GC
-      RunsTotal = Metric.new('GC/Runs/Total', :times,
-        lambda { ::GC.respond_to?(:runs) },
-        lambda { ::GC.runs })
-      Runs = Change.new('GC/Runs', RunsTotal)
+      CollectionsTotal = Metric.new('GC/Collections/Total', :times,
+        lambda { ::GC.respond_to?(:collections) },
+        lambda { ::GC.collections})
+      Collections = Change.new('GC/Collections', CollectionsTotal)
 
       TimeTotal = Metric.new('GC/Time/Total', :sec,
         lambda { ::GC.respond_to?(:time) },
@@ -42,7 +42,7 @@ module Trashed
 
     add Objects::Live,
       Objects::AllocatedTotal, Objects::Allocated,
-      GC::RunsTotal, GC::Runs,
+      GC::CollectionsTotal, GC::Collections,
       GC::TimeTotal, GC::Time,
       GC::MallocTotal, GC::Malloc
   end

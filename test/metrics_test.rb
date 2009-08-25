@@ -113,7 +113,7 @@ class LookupTest < ActiveSupport::TestCase
   end
 
   test 'default metrics are registered' do
-    %w(Objects/Live Objects/Allocated GC/Runs GC/Time GC/Malloc).each do |label|
+    %w(Objects/Live Objects/Allocated GC/Collections GC/Time GC/Malloc).each do |label|
       metric = Trashed::Metrics[label]
       assert_not_nil metric, "Missing metric #{label}"
       assert metric.respond_to?(:measure)
