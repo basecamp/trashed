@@ -10,13 +10,8 @@ module Trashed
         def add_sampler(metric, add_method)
           if sampler = Sampler.build(metric)
             ::NewRelic::Agent.instance.stats_engine.send(add_method, sampler)
-            log "[Trashed] NewRelic sampling #{metric}"
+            ::NewRelic::Control.instance.log "[Trashed] sampling #{metric}"
           end
-        end
-
-        def log(message)
-          agent = ::NewRelic::Agent.instance
-          agent.logger.error(message) if agent.respond_to?(:logger)
         end
     end
 
