@@ -4,5 +4,6 @@ rescue LoadError
   require 'active_support'
 end
 
-require 'trashed/version'
-require 'trashed/metrics'
+module Trashed
+  require 'trashed/metrics'
+end
