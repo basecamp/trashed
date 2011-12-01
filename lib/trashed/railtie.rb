@@ -11,7 +11,7 @@ module Trashed
 
     initializer 'newrelic sampler' do |app|
       if NewRelic::Control.instance.agent_enabled?
-        require 'trashed/newrelic'
+        require 'trashed/new_relic'
         Trashed::NewRelic.sample ResourceUsage, config.trashed
       end
     end
