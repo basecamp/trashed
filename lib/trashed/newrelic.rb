@@ -1,7 +1,7 @@
 module Trashed
   module Newrelic
     def self.sample(meter, statsd = nil)
-      ::NewRelic::Agent.instance.stats_engine.add_sampler, Sampler.new(meter, statsd)
+      ::NewRelic::Agent.instance.stats_engine.add_sampler Sampler.new(meter, statsd)
     end
 
     class Sampler
