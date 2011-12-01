@@ -1,41 +1,42 @@
-require 'trashed'
-
 module Trashed
-  module NewRelic
-    class << self
-      def sample(metric)  add_sampler metric, :add_sampler end
-      def harvest(metric) add_sampler metric, :add_harvest_sampler end
-
-      private
-        def add_sampler(metric, add_method)
-          if sampler = Sampler.build(metric)
-            ::NewRelic::Agent.instance.stats_engine.send(add_method, sampler)
-            ::NewRelic::Control.instance.log "[Trashed] sampling #{metric}"
-          end
-        end
+  module Newrelic
+    def self.sample(meter, statsd = nil)
+      ::NewRelic::Agent.instance.stats_engine.add_sampler, Sampler.new(meter, statsd)
     end
 
     class Sampler
-      def self.build(label_or_metric)
-        if metric = Trashed::Metrics[label_or_metric] and metric.available?
-          new(metric)
-        end
-      end
-
       attr_accessor :stats_engine
 
-      def initialize(metric)
-        @metric, @label = metric, "Custom/#{metric.label}"
+      def initialize(meter, options = nil)
+        @meter = meter
+        @label, @statsd = options.values_at(:label, :statsd) if options
+        @label ||= 'Custom/%s'
       end
 
       def poll
-        stats.record_data_point(@metric.measure)
+        @meter.gauge.each do |name, value|
+          record_statsd   name, value
+          record_newrelic name, value
+        end
       end
 
-      protected
-        def stats
-          stats_engine.get_stats(@label, false)
-        end
+      private
+
+      def record_statsd(name, value)
+        @statsd.timing "Performance.#{name}", value if @statsd
+      end
+
+      def record_newrelic(name, value)
+        stats_for(label_for(name)).record_data_point(value)
+      end
+
+      def stats_for(metric)
+        stats_engine.get_stats(metric, false)
+      end
+
+      def label_for(name)
+        @label % name.gsub('.', '/')
+      end
     end
   end
 end

@@ -1,9 +1,5 @@
-begin
-  require 'active_support/all'
-rescue LoadError
-  require 'active_support'
-end
-
 module Trashed
-  require 'trashed/metrics'
+  require 'trashed/meter'
+  require 'trashed/resource_usage'
+  require 'trashed/rack'
 end
