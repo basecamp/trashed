@@ -6,7 +6,7 @@ module Trashed
 
         if @options
           @logger   = options[:logger]
-          @verbose  = options[:verbose]
+          @debug    = options[:debug]
         end
       end
 
