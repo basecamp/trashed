@@ -23,7 +23,7 @@ module Trashed
       private
 
       def record_statsd(name, value)
-        @statsd.timing "Performance.GC.#{name}", value if @statsd
+        @statsd.timing "Performance.#{name}", value if @statsd
       end
 
       def record_newrelic(name, value)
