@@ -9,7 +9,7 @@ module Trashed
       app.middleware.insert_after '::Rack::Lock', Trashed::Rack::MeasureResourceUsage, config.trashed.merge(:logger => Rails.logger)
     end
 
-    initializer 'newrelic sampler' do |app|
+    initializer 'newrelic sampler', :after => 'newrelic_rpm.start_plugin' do |app|
       if NewRelic::Control.instance.agent_enabled?
         require 'trashed/new_relic'
         Trashed::NewRelic.sample ResourceUsage, config.trashed
