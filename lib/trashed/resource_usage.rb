@@ -28,6 +28,10 @@ module Trashed
 
     # Ruby 1.9+
     elsif ObjectSpace.respond_to? :count_objects
+      counts :Objects do
+        { :total => ObjectSpace.count_objects[:TOTAL] }
+      end
+
       gauges :Objects do
         ObjectSpace.count_objects
       end
