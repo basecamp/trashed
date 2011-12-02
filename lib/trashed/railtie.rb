@@ -11,11 +11,11 @@ module Trashed
 
     config.trashed = Config.new
 
-    initializer 'trashed.logger' do |app|
+    initializer 'trashed' do |app|
       config.trashed.logger ||= Rails.logger
     end
 
-    initializer 'trashed.middleware' do |app|
+    initializer 'trashed.middleware', :after => 'trashed', :before => 'trashed.newrelic' do |app|
       app.middleware.insert_after '::Rack::Lock', Trashed::Rack::MeasureResourceUsage, config.trashed.to_hash
     end
 
