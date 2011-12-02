@@ -3,21 +3,26 @@ require 'rails/railtie'
 
 module Trashed
   class Railtie < ::Rails::Railtie
-    config.trashed = Struct.new(:debug, :logger, :statsd).new
+    class Config < Struct.new(:debug, :logger, :statsd, :sample_rate)
+      def to_hash
+        { :debug => debug, :logger => logger, :statsd => statsd, :sample_rate => sample_rate }
+      end
+    end
+
+    config.trashed = Config.new
 
     initializer 'trashed.logger' do |app|
       config.trashed.logger ||= Rails.logger
     end
 
     initializer 'trashed.middleware' do |app|
-      app.middleware.insert_after '::Rack::Lock', Trashed::Rack::MeasureResourceUsage,
-        :debug => config.trashed.debug, :logger => config.trashed.logger
+      app.middleware.insert_after '::Rack::Lock', Trashed::Rack::MeasureResourceUsage, config.trashed.to_hash
     end
 
     initializer 'trashed.newrelic', :after => 'newrelic_rpm.start_plugin' do |app|
       if NewRelic::Control.instance.agent_enabled?
         require 'trashed/new_relic'
-        Trashed::NewRelic.sample ResourceUsage, :statsd => config.trashed.statsd
+        Trashed::NewRelic.sample ResourceUsage, config.trashed.to_hash
       end
     end
   end
