@@ -9,32 +9,38 @@ module Trashed
 
       def call(env)
         response = nil
-        instrument { response = @app.call(env) }
+        instrument(env) { response = @app.call(env) }
         response
       end
 
-      def instrument(&block)
-        change = env['trashed.change'] = ResourceUsage.instrument(&block)
-        usage  = env['trashed.usage']  = ResourceUsage.gauge
-        record change, usage
+      def instrument(env, &block)
+        change = ResourceUsage.instrument(&block)
+        usage  = ResourceUsage.gauge
+        record env, change, usage
       end
 
-      def record(change, usage)
-        record_logger change, usage if @logger
-        record_statsd change, usage if @statsd
+      def record(env, change, usage)
+        record_env    env, change, usage
+        record_logger env, change, usage if @logger
+        record_statsd env, change, usage if @statsd
       end
 
-      def record_logger(change, usage)
+      def record_env(env, change, usage)
+        env['trashed.change'] = change
+        env['trashed.usage']  = usage
+      end
+
+      def record_logger(env, change, usage)
         @logger.info "Rack handled in %dms (GC runs: %d)" % change.values_at('Time.wall', 'GC.count')
-        record_debug_logger change, usage if @debug
+        record_debug_logger env, change, usage if @debug
       end
 
-      def record_debug_logger(change, usage)
+      def record_debug_logger(env, change, usage)
         @logger.debug "Changes: #{change.to_yaml}"
         @logger.debug "Usage: #{usage.to_yaml}"
       end
 
-      def record_statsd(change, usage)
+      def record_statsd(env, change, usage)
         record_statsd_timing change
         record_statsd_timing usage
       end

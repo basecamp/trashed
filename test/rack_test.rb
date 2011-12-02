@@ -8,10 +8,10 @@ class RackTest < MiniTest::Unit::TestCase
 
     response = Trashed::Rack::MeasureResourceUsage.new(Hello).call(env)
 
-    refute_nil env['trashed.used']
-    refute_nil env['trashed.snapshot']
+    refute_nil env['trashed.change']
+    refute_nil env['trashed.usage']
 
-    elapsed = env['trashed.used']['Time.wall']
+    elapsed = env['trashed.change']['Time.wall']
     refute_nil elapsed
     assert_in_delta elapsed, 0, 1000
   end
