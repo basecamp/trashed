@@ -11,6 +11,9 @@ module Trashed
       app.config.trashed.sample_rate ||= 0.1
       app.config.trashed.statsd = connect_to_statsd(app.config.trashed[:statsd])
       app.config.trashed.logger = Rails.logger
+
+      # Debug data sent to statsd. Class-level config only :/
+      Statsd.logger = app.config.trashed.logger if app.config.trashed.debug
     end
 
     initializer 'trashed.middleware', :after => 'trashed', :before => 'trashed.newrelic' do |app|
