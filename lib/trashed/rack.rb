@@ -46,7 +46,9 @@ module Trashed
       end
 
       def record_statsd_timing(data)
-        data.each { |name, value| @statsd.timing "Performance.#{name}", value, @sample_rate }
+        data.each do |name, value|
+          @statsd.timing name, value, @sample_rate
+        end
       end
     end
   end

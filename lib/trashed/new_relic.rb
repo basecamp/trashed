@@ -28,7 +28,7 @@ module Trashed
       private
 
       def record_statsd(name, value)
-        @statsd.timing "Performance.#{name}", value
+        @statsd.timing name, value
       end
 
       def record_newrelic(name, value)
