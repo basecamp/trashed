@@ -1,7 +1,7 @@
 module Trashed
   ResourceUsage = Meter.new do
 
-    # Wall clock time, in milliseconds
+    # Wall clock time, in milliseconds since epoch
     counts :Time do
       { :wall => (Time.now.to_f * 1000).to_i }
     end
