@@ -41,12 +41,13 @@ module Trashed
       end
 
       def record_statsd(env, change, usage)
-        record_statsd_timing change
+        record_statsd_timing change, :Rack
         record_statsd_timing usage
       end
 
-      def record_statsd_timing(data)
+      def record_statsd_timing(data, namespace = nil)
         data.each do |name, value|
+          name = "#{namespace}.#{name}" if namespace
           @statsd.timing name, value, @sample_rate
         end
       end
