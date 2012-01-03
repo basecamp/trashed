@@ -21,7 +21,7 @@ module Trashed
     end
 
     initializer 'trashed.newrelic', :after => 'newrelic_rpm.start_plugin' do |app|
-      if NewRelic::Control.instance.agent_enabled?
+      if defined?(NewRelic::Control) && NewRelic::Control.instance.agent_enabled?
         require 'trashed/new_relic'
         Trashed::NewRelic.sample ResourceUsage, app.config.trashed
       end
