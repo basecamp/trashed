@@ -41,8 +41,8 @@ module Trashed
       end
 
       def record_statsd(env, change, usage)
-        record_statsd_timing change, :Rack
-        record_statsd_timing usage
+        record_statsd_timing change, :'Rack.Request'
+        record_statsd_timing usage,  :Rack
       end
 
       def record_statsd_timing(data, namespace = nil)
