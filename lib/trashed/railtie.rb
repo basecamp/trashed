@@ -19,14 +19,16 @@ module Trashed
         # Rails 3.2. Record request controller, action, and format.
         if controller = env['action_controller.instance']
           name, action, format = controller.controller_name, controller.action_name, controller.request.format.to_sym.to_s
-          [ name, format, "#{name}.#{action}", "#{name}.#{action}.#{format}" ]
+          [ "Controllers.#{name}",
+            "Formats.#{format}",
+            "Actions.#{name}.#{action}.#{format}" ]
         end
       end
 
       hostname = `hostname -s`.chomp
       app.config.trashed.statsd_sampler_namespaces = lambda do |env|
         # Rails 3.2. Record hostname.
-        [ hostname ]
+        [ "Hosts.#{hostname}" ]
       end
     end
 

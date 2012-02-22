@@ -43,15 +43,15 @@ module Trashed
       end
 
       def record_statsd(env, change, usage)
-        record_statsd_timing change, :'Rack.Request'
-        record_statsd_timing usage,  :Rack
+        record_statsd_timing change, :'Rack.Request.All'
+        record_statsd_timing usage,  :'Rack.Server.All'
 
         Array(@request_namespaces.call(env)).each do |namespace|
           record_statsd_timing change, "Rack.Request.#{namespace}"
         end if @request_namespaces
 
         Array(@sampler_namespaces.call(env)).each do |namespace|
-          record_statsd_timing usage, "Rack.#{namespace}"
+          record_statsd_timing usage, "Rack.Server.#{namespace}"
         end if @sampler_namespaces
       end
 
