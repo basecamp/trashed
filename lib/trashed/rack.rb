@@ -5,6 +5,8 @@ module Trashed
         @app = app
         @debug, @logger, @statsd, @sample_rate = options.values_at(:debug, :logger, :statsd, :sample_rate)
         @sample_rate ||= 0.1
+
+        @request_namespaces, @sampler_namespaces = options.values_at(:statsd_request_namespaces, :statsd_sampler_namespaces)
       end
 
       def call(env)
@@ -43,6 +45,14 @@ module Trashed
       def record_statsd(env, change, usage)
         record_statsd_timing change, :'Rack.Request'
         record_statsd_timing usage,  :Rack
+
+        Array(@request_namespaces.call(env)).each do |namespace|
+          record_statsd_timing change, "Rack.Request.#{namespace}"
+        end if @request_namespaces
+
+        Array(@sampler_namespaces.call(env)).each do |namespace|
+          record_statsd_timing usage, "Rack.#{namespace}"
+        end if @sampler_namespaces
       end
 
       def record_statsd_timing(data, namespace = nil)

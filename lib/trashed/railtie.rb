@@ -8,12 +8,26 @@ module Trashed
     config.trashed.statsd = ActiveSupport::OrderedOptions.new
 
     initializer 'trashed' do |app|
+      # Debug data sent to statsd. Class-level config only :/
+      Statsd.logger = app.config.trashed.logger if app.config.trashed.debug
+
       app.config.trashed.sample_rate ||= 0.1
       app.config.trashed.logger = Rails.logger
       app.config.trashed.statsd = connect_to_statsd(app.config.trashed.statsd)
 
-      # Debug data sent to statsd. Class-level config only :/
-      Statsd.logger = app.config.trashed.logger if app.config.trashed.debug
+      app.config.trashed.statsd_request_namespaces = lambda do |env|
+        # Rails 3.2. Record request controller, action, and format.
+        if controller = env['action_controller.instance']
+          name, action, format = controller.controller_name, controller.action_name, controller.request.format.to_sym.to_s
+          [ name, format, "#{name}.#{action}", "#{name}.#{action}.#{format}" ]
+        end
+      end
+
+      hostname = `hostname -s`.chomp
+      app.config.trashed.statsd_sampler_namespaces = lambda do |env|
+        # Rails 3.2. Record hostname.
+        [ hostname ]
+      end
     end
 
     initializer 'trashed.middleware', :after => 'trashed', :before => 'trashed.newrelic' do |app|
