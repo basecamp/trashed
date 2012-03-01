@@ -51,7 +51,7 @@ module Trashed
         options
       when Hash
         Statsd.new(options[:host], options[:port]).tap do |statsd|
-          statsd.namespace = [options[:namespace], 'Performance'].compact.join('.')
+          statsd.namespace = options[:namespace]
         end
       end
     end
