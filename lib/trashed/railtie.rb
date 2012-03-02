@@ -18,7 +18,9 @@ module Trashed
       app.config.trashed.statsd_request_namespaces = lambda do |env|
         # Rails 3.2. Record request controller, action, and format.
         if controller = env['action_controller.instance']
-          name, action, format = controller.controller_name, controller.action_name, controller.request.format.to_sym.to_s
+          name    = controller.controller_name
+          action  = controller.action_name
+          format  = controller.request.format.try(:to_sym)
           [ "Controllers.#{name}",
             "Formats.#{format}",
             "Actions.#{name}.#{action}.#{format}" ]
@@ -33,7 +35,7 @@ module Trashed
     end
 
     initializer 'trashed.middleware', :after => 'trashed', :before => 'trashed.newrelic' do |app|
-      app.middleware.insert 0, Trashed::Rack::MeasureResourceUsage, app.config.trashed
+      app.middleware.insert_after 'Rack::Lock', Trashed::Rack::MeasureResourceUsage, app.config.trashed
     end
 
     initializer 'trashed.newrelic', :after => 'newrelic_rpm.start_plugin' do |app|
