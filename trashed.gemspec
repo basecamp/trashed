@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.homepage  = 'https://github.com/37signals/trashed'
   s.summary   = 'Keep tabs on Ruby garbage collection: object counts, allocated bytes, GC time.'
 
-  s.add_dependency 'statsd-ruby', '~> 0.3.1.signals.1'
+  s.add_dependency 'statsd-ruby', '~> 0.4'
 
   s.files = Dir["#{File.dirname(__FILE__)}/**/*"]
 end
