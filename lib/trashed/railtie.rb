@@ -35,7 +35,7 @@ module Trashed
     end
 
     initializer 'trashed.middleware', :after => 'trashed', :before => 'trashed.newrelic' do |app|
-      app.middleware.insert_after 'Rack::Lock', Trashed::Rack::MeasureResourceUsage, app.config.trashed
+      app.middleware.insert_after 'Rack::Runtime', Trashed::Rack::MeasureResourceUsage, app.config.trashed
     end
 
     initializer 'trashed.newrelic', :after => 'newrelic_rpm.start_plugin' do |app|
