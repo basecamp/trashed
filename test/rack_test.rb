@@ -6,6 +6,7 @@ class RackTest < Minitest::Test
   def setup
     @reporter = Object.new
     def @reporter.report(env) end
+    def @reporter.sample?(env) true end
   end
 
   def test_instruments_app_and_stores_in_env

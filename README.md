@@ -92,6 +92,10 @@ YourNamespace.Hosts.host-001.Objects.T_STRING
 
 ### Version history
 
+*3.0.1* (March 30, 2014)
+
+* Sample requests to instrument based on StatsD sample rate.
+
 *3.0.0* (March 29, 2014)
 
 * Support new Ruby 2.0 and 2.1 GC stats.

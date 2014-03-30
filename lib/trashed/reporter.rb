@@ -15,17 +15,24 @@ module Trashed
       @gauge_dimensions   = ->(env) { DEFAULT_DIMENSIONS }
     end
 
+    # Override in subclasses. Be sure to `super && ...` if you want to rely
+    # on the sample_rate.
+    def sample?(env = nil)
+      random_sample?
+    end
+
+    def random_sample?
+      @sample_rate == 1 or rand < @sample_rate
+    end
+
     def report(env)
       report_logger env if @logger
       report_statsd env if @statsd
     end
 
     def report_logger(env)
-      elapsed = env[Trashed::Rack::TIMINGS].assoc(:'Time.wall')
-      gc_runs = env[Trashed::Rack::TIMINGS].assoc(:'GC.count')
-      if elapsed && gc_runs
-        @logger.info "Rack handled in %dms (GC runs: %d)" % [elapsed[1], gc_runs[1]]
-      end
+      timings = env[Trashed::Rack::TIMINGS]
+      @logger.info "Rack handled in %dms (GC runs: %d)" % timings.values_at(:'Time.wall', :'GC.count')
     end
 
     def report_statsd(env)

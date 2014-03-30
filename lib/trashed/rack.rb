@@ -7,14 +7,7 @@ module Trashed
     def initialize(app, reporter, options = {})
       @reporter = reporter
       @meters = Array(options.fetch(:meters, [ResourceUsage]))
-      @logger, @statsd, @sample_rate = options.values_at(:logger, :statsd_instance, :sample_rate)
-      @sample_rate ||= 1.0
-
-      @request_namespaces = options[:statsd_request_namespaces]
-      @sampler_namespaces = options[:statsd_sampler_namespaces]
-
-      # Wrap the app up in the meters.
-      @app = build_instrumented_app(app, @meters)
+      @app = build_sampled_instrumented_app(app, @meters)
     end
 
     def call(env)
@@ -26,6 +19,20 @@ module Trashed
     end
 
     private
+    def build_sampled_instrumented_app(app, meters)
+      build_sampled_app app, build_instrumented_app(app, meters)
+    end
+
+    def build_sampled_app(app, instrumented)
+      lambda do |env|
+        if @reporter.sample? env
+          instrumented.call env
+        else
+          app.call env
+        end
+      end
+    end
+
     def build_instrumented_app(app, meters)
       meters.inject app do |wrapped, meter|
         lambda do |env|
