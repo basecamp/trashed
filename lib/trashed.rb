@@ -1,5 +1,2 @@
-module Trashed
-  require 'trashed/meter'
-  require 'trashed/resource_usage'
-  require 'trashed/rack'
-end
+require 'trashed/rack'
+require 'trashed/railtie' if defined? ::Rails::Railtie

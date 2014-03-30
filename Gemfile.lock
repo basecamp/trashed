@@ -1,0 +1,20 @@
+PATH
+  remote: .
+  specs:
+    trashed (3.0.0)
+      statsd-ruby (~> 1.1)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    minitest (5.3.1)
+    rake (10.2.2)
+    statsd-ruby (1.2.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  minitest (~> 5.3)
+  rake
+  trashed!
