@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    trashed (3.0.1)
+    trashed (3.1.0)
       statsd-ruby (~> 1.1)
 
 GEM

@@ -11,7 +11,7 @@ module Trashed
     end
 
     def call(env)
-      env[STATE]   = {}
+      env[STATE]   = { :persistent => persistent_thread_state }
       env[TIMINGS] = {}
       env[GAUGES]  = []
 
@@ -19,6 +19,10 @@ module Trashed
     end
 
     private
+    def persistent_thread_state
+      Thread.current[:trashed_rack_state] ||= {}
+    end
+
     def build_sampled_instrumented_app(app, meters)
       build_sampled_app app, build_instrumented_app(app, meters)
     end

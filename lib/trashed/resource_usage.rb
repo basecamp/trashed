@@ -21,26 +21,20 @@ module Trashed
 
     # Ruby 1.9+
     if GC.respond_to?(:stat)
-      case
-      # Ruby 2.1+
-      when GC.stat[:major_gc_count]
-        require 'trashed/instruments/ruby21_gc'
-        meter.instrument Trashed::Instruments::Ruby21GC.new
-      # Ruby 2.0+
-      when GC.stat[:total_allocated_object]
-        require 'trashed/instruments/ruby20_gc'
-        meter.instrument Trashed::Instruments::Ruby20GC.new
-      # Ruby 1.9
-      else
-        require 'trashed/instruments/ruby19_gc'
-        meter.instrument Trashed::Instruments::Ruby19GC.new
-      end
+      require 'trashed/instruments/ruby_gc'
+      meter.instrument Trashed::Instruments::RubyGC.new
     end
 
     # Ruby 1.9+
     if defined? GC::Profiler
       require 'trashed/instruments/ruby_gc_profiler'
       meter.instrument Trashed::Instruments::RubyGCProfiler.new
+    end
+
+    # Ruby 2.1+ with https://github.com/tmm1/gctools
+    if defined? GC::OOB
+      require 'trashed/instruments/gctools_oobgc'
+      meter.instrument Trashed::Instruments::GctoolsOobgc.new
     end
   end
 end

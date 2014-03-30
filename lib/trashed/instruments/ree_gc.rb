@@ -5,20 +5,22 @@ module Trashed
         GC.enable_stats
       end
 
-      def start(state)
-        state.update \
-          :'Objects.total' => ObjectSpace.allocated_objects,
-          :'GC.count'      => GC.collections,
-          :'GC.elapsed'    => GC.time,
-          :'GC.memory'     => GC.allocated_size
+      def start(state, timings, gauges)
+        state[:ruby18_gc] = {
+          :objects   => ObjectSpace.allocated_objects,
+          :gc_count  => GC.collections,
+          :gc_time   => GC.time,
+          :gc_memory => GC.allocated_size }
       end
 
       def measure(state, timings, gauges)
+        before = state[:ruby18_gc]
+
         timings.update \
-          :'Objects.total' => ObjectSpace.allocated_objects - state[:'Objects.total'],
-          :'GC.count'      => GC.collections - state[:'GC.count'],
-          :'GC.elapsed'    => GC.time - state[:'GC.elapsed'],
-          :'GC.memory'     => GC.allocated_size - state[:'GC.memory']
+          :'GC.count'             => GC.collections - before[:gc_count],
+          :'GC.time'              => GC.time - before[:gc_time],
+          :'GC.memory'            => GC.allocated_size - before[:gc_memory],
+          :'GC.allocated_objects' => ObjectSpace.allocated_objects - before[:objects]
 
         gauges << [ :'Objects.live',  ObjectSpace.live_objects ]
         gauges << [ :'GC.growth',     GC.growth ]

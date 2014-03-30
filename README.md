@@ -92,6 +92,18 @@ YourNamespace.Hosts.host-001.Objects.T_STRING
 
 ### Version history
 
+*3.1.0* (March 30, 2014)
+
+* Report percent CPU/idle time: Time.pct.cpu and Time.pct.idle.
+* Measure out-of-band GC count, time, and stats. Only meaningful for
+  single-threaded servers like Unicorn. But then again so is per-request
+  GC monitoring.
+* Support @tmm1's GC::OOB (https://github.com/tmm1/gctools).
+* Measure time between GCs.
+* Spiff up logger reports with more timings.
+* Support Rails log tags on logged reports.
+* Allow instruments' #start to set timings/gauges.
+
 *3.0.1* (March 30, 2014)
 
 * Sample requests to instrument based on StatsD sample rate.

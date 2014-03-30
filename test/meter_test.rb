@@ -22,7 +22,7 @@ class MeterTest < Minitest::Test
 
   def test_instruments
     i = Object.new
-    def i.start(state) state[:foo] = 10 end
+    def i.start(state, timings, gauges) state[:foo] = 10 end
     def i.measure(state, timings, gauges)
       timings[:foo] = state.delete(:foo) - 2
       gauges << [ :bar, 2 ]
