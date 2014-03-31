@@ -16,5 +16,5 @@ PLATFORMS
 
 DEPENDENCIES
   minitest (~> 5.3)
-  rake
+  rake (~> 10.2)
   trashed!
