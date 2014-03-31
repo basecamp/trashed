@@ -38,8 +38,8 @@ if defined? GC::Profiler
       assert_equal 2, timings[:"#{captured}.count"]
 
       if GC::Profiler.respond_to? :raw_data
-        assert_equal elapsed, timings[:"#{captured}.time"]
-        assert_equal intervals, timings[:'GC.interval']
+        assert_equal 1000 * elapsed, timings[:"#{captured}.time"]
+        assert_equal intervals.map { |i| 1000 * i }, timings[:'GC.interval']
       end
     end
   end

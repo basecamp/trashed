@@ -84,7 +84,7 @@ module Trashed
         case value
         when Array
           value.each do |v|
-            send_to_statsd statsd, method, { metric => v }, namespace, dimensions
+            send_to_statsd statsd, method, sample_rate, { metric => v }, namespace, dimensions
           end
         when Numeric
           Array(dimensions || :All).each do |dimension|
