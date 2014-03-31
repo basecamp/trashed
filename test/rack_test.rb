@@ -6,7 +6,8 @@ class RackTest < Minitest::Test
   def setup
     @reporter = Object.new
     def @reporter.report(env) end
-    def @reporter.sample?(env) true end
+    def @reporter.request_reporting_rate; 1 end
+    def @reporter.gauge_sample_rate; 1 end
   end
 
   def test_instruments_app_and_stores_in_env

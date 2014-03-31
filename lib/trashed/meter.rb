@@ -3,8 +3,8 @@ module Trashed
     attr_reader :instruments
 
     def initialize
-      @instruments = []
-      @needs_start = []
+      @timers = []
+      @gauges = []
     end
 
     # Counters increase, so we measure before/after differences.
@@ -20,14 +20,18 @@ module Trashed
     end
 
     def instrument(instrument)
-      @instruments << instrument
-      @needs_start << instrument if instrument.respond_to?(:start)
+      if instrument.respond_to?(:start)
+        @timers << instrument
+      else
+        @gauges << instrument
+      end
     end
 
     def instrument!(state, timings, gauges)
-      @needs_start.each { |i| i.start state, timings, gauges }
+      @timers.each { |i| i.start state, timings, gauges }
       yield.tap do
-        @instruments.reverse_each { |i| i.measure state, timings, gauges }
+        @timers.reverse_each { |i| i.measure state, timings, gauges }
+        @gauges.each { |i| i.measure state, timings, gauges }
       end
     end
 

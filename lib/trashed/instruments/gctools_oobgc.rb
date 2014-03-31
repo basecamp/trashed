@@ -6,10 +6,10 @@ module Trashed
         last = state[:persistent][:oobgc] || Hash.new(0)
 
         current = {
-          :count => GC::OOB.stat(:count),
-          :major => GC::OOB.stat(:major),
-          :minor => GC::OOB.stat(:minor),
-          :sweep => GC::OOB.stat(:sweep) }
+          :count => GC::OOB.stat(:count).to_i,
+          :major => GC::OOB.stat(:major).to_i,
+          :minor => GC::OOB.stat(:minor).to_i,
+          :sweep => GC::OOB.stat(:sweep).to_i }
 
         timings.update \
           :'OOBGC.count'        => current[:count] - last[:count],

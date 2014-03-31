@@ -17,12 +17,7 @@ module Trashed
 
         if @has_raw_data
           timings[:"#{captured}.count"] ||= GC::Profiler.raw_data.size
-
           timings[:'GC.interval'] = GC::Profiler.raw_data.map { |data| data[:GC_INVOKE_TIME] }
-
-          GC::Profiler.raw_data.each do |data|
-            gauges.concat data.map { |k, v| [ :"GC.Profiler.#{k}", v ] }
-          end
         end
 
         GC::Profiler.clear

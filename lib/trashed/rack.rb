@@ -7,7 +7,7 @@ module Trashed
     def initialize(app, reporter, options = {})
       @reporter = reporter
       @meters = Array(options.fetch(:meters, [ResourceUsage]))
-      @app = build_sampled_instrumented_app(app, @meters)
+      @app = build_instrumented_app(app, @meters)
     end
 
     def call(env)
@@ -21,20 +21,6 @@ module Trashed
     private
     def persistent_thread_state
       Thread.current[:trashed_rack_state] ||= {}
-    end
-
-    def build_sampled_instrumented_app(app, meters)
-      build_sampled_app app, build_instrumented_app(app, meters)
-    end
-
-    def build_sampled_app(app, instrumented)
-      lambda do |env|
-        if @reporter.sample? env
-          instrumented.call env
-        else
-          app.call env
-        end
-      end
     end
 
     def build_instrumented_app(app, meters)

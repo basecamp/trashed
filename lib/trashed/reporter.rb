@@ -2,7 +2,8 @@ require 'trashed/rack'
 
 module Trashed
   class Reporter
-    attr_accessor :logger, :statsd, :sample_rate
+    attr_accessor :logger, :statsd
+    attr_accessor :timing_sample_rate, :gauge_sample_rate
     attr_accessor :timing_dimensions, :gauge_dimensions
 
     DEFAULT_DIMENSIONS = [ :All ]
@@ -10,19 +11,10 @@ module Trashed
     def initialize
       @logger = nil
       @statsd = nil
-      @sample_rate = 1.0
+      @timing_sample_rate = 0.1
+      @gauge_sample_rate = 0.05
       @timing_dimensions  = ->(env) { DEFAULT_DIMENSIONS }
       @gauge_dimensions   = ->(env) { DEFAULT_DIMENSIONS }
-    end
-
-    # Override in subclasses. Be sure to `super && ...` if you want to rely
-    # on the sample_rate.
-    def sample?(env = nil)
-      random_sample?
-    end
-
-    def random_sample?
-      @sample_rate == 1 or rand < @sample_rate
     end
 
     def report(env)
@@ -80,13 +72,14 @@ module Trashed
     end
 
     def report_statsd(env)
-      @statsd.batch do |statsd|
-        send_to_statsd statsd, :timing, env[Trashed::Rack::TIMINGS], :'Rack.Request', @timing_dimensions.call(env)
-        send_to_statsd statsd, :gauge,  env[Trashed::Rack::GAUGES],  :'Rack.Server',  @gauge_dimensions.call(env)
+      method = @statsd.respond_to?(:easy) ? :easy : :batch
+      @statsd.send(method) do |statsd|
+        send_to_statsd statsd, :timing, @timing_sample_rate, env[Trashed::Rack::TIMINGS], :'Rack.Request', @timing_dimensions.call(env)
+        send_to_statsd statsd, :timing, @gauge_sample_rate,  env[Trashed::Rack::GAUGES],  :'Rack.Server',  @gauge_dimensions.call(env)
       end
     end
 
-    def send_to_statsd(statsd, method, measurements, namespace, dimensions)
+    def send_to_statsd(statsd, method, sample_rate, measurements, namespace, dimensions)
       measurements.each do |metric, value|
         case value
         when Array
@@ -95,7 +88,7 @@ module Trashed
           end
         when Numeric
           Array(dimensions || :All).each do |dimension|
-            statsd.send method, :"#{namespace}.#{dimension}.#{metric}", value, @sample_rate
+            statsd.send method, :"#{namespace}.#{dimension}.#{metric}", value, sample_rate
           end
         end
       end

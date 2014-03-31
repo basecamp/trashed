@@ -92,6 +92,14 @@ YourNamespace.Hosts.host-001.Objects.T_STRING
 
 ### Version history
 
+*3.2.0* (March 31, 2014)
+
+* Reduce default sampling rates.
+* Stop gauging all GC::Profiler data. Too noisy.
+* Report gauge readings as StatsD timings.
+* Support providing a Statsd::Batch since using Statsd#batch
+  results in underfilled packets at low sample rates.
+
 *3.1.0* (March 30, 2014)
 
 * Report percent CPU/idle time: Time.pct.cpu and Time.pct.idle.

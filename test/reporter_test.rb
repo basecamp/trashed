@@ -6,23 +6,13 @@ require 'stringio'
 class ReporterTest < Minitest::Test
   def setup
     @reporter = Trashed::Reporter.new
+    @reporter.timing_sample_rate = 1
+    @reporter.gauge_sample_rate = 1
   end
 
-  def test_sample_rate_defaults_to_1
-    assert_equal 1.0, @reporter.sample_rate
-  end
-
-  def test_random_sample?
-    @reporter.sample_rate = 0.2
-
-    def @reporter.rand; 0.3 end
-    assert !@reporter.sample?
-
-    def @reporter.rand; 0.2 end
-    assert !@reporter.sample?
-
-    def @reporter.rand; 0.1 end
-    assert @reporter.sample?
+  def test_sample_rate_defaults
+    assert_equal 0.1, Trashed::Reporter.new.timing_sample_rate
+    assert_equal 0.05, Trashed::Reporter.new.gauge_sample_rate
   end
 
   def test_report_logger

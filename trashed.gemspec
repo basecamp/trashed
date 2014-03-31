@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name      = 'trashed'
-  s.version   = '3.1.0'
+  s.version   = '3.2.0'
   s.license   = 'MIT'
   s.summary   = 'Rack request GC stats => logs + StatsD'
   s.description = 'Each Rack request eats up time, objects, and GC. Report usage to logs and StatsD.'
