@@ -92,6 +92,10 @@ YourNamespace.Hosts.host-001.Objects.T_STRING
 
 ### Version history
 
+*3.2.3* (June 23, 2014)
+
+* Report CPU/Idle time in tenths of a percent
+
 *3.2.2* (March 31, 2014)
 
 * Reduce default sampling rates.

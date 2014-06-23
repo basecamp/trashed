@@ -17,7 +17,7 @@ class ReporterTest < Minitest::Test
 
   def test_report_logger
     assert_report_logs 'Rack handled in 1.00ms.'
-    assert_report_logs 'Rack handled in 1.00ms (10.0% cpu, 90.0% idle).', :'Time.pct.cpu' => 10, :'Time.pct.idle' => 90
+    assert_report_logs 'Rack handled in 1.00ms (9.9% cpu, 90.1% idle).', :'Time.pct.cpu' => 9.9, :'Time.pct.idle' => 90.1
 
     assert_report_logs 'Rack handled in 1.00ms.', :'GC.allocated_objects' => 0
     assert_report_logs 'Rack handled in 1.00ms. 10 objects.', :'GC.allocated_objects' => 10
@@ -32,8 +32,8 @@ class ReporterTest < Minitest::Test
     assert_report_logs 'Rack handled in 1.00ms. 0 GCs. Avoided 3 OOB GCs (4 major, 5 minor, 6 sweep).', :'OOBGC.count' => 3, :'OOBGC.major_count' => 4, :'OOBGC.minor_count' => 5, :'OOBGC.sweep_count' => 6
     assert_report_logs 'Rack handled in 1.00ms. 0 GCs. Avoided 3 OOB GCs saving 10.00ms.', :'OOBGC.count' => 3, :'OOBGC.time' => 10
 
-    assert_report_logs 'Rack handled in 1.00ms (10.0% cpu, 90.0% idle). 10 objects. 2 GCs (3 major, 4 minor) took 10.00ms. Avoided 3 OOB GCs (4 major, 5 minor, 6 sweep) saving 10.00ms.',
-      :'Time.pct.cpu' => 10, :'Time.pct.idle' => 90,
+    assert_report_logs 'Rack handled in 1.00ms (9.1% cpu, 90.1% idle). 10 objects. 2 GCs (3 major, 4 minor) took 10.00ms. Avoided 3 OOB GCs (4 major, 5 minor, 6 sweep) saving 10.00ms.',
+      :'Time.pct.cpu' => 9.1, :'Time.pct.idle' => 90.1,
       :'GC.allocated_objects' => 10,
       :'GC.count' => 2, :'GC.time' => 10,
       :'GC.major_count' => 3, :'GC.minor_count' => 4,

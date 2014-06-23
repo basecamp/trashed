@@ -28,7 +28,7 @@ module Trashed
 
       elapsed = '%.2fms' % timings[:'Time.wall']
       if timings[:'Time.pct.cpu']
-        elapsed << ' (%.1f%% cpu, %.1f%% idle)' % timings.values_at(:'Time.pct.cpu', :'Time.pct.idle').map(&:to_i)
+        elapsed << ' (%.1f%% cpu, %.1f%% idle)' % timings.values_at(:'Time.pct.cpu', :'Time.pct.idle')
       end
       parts << elapsed
 
