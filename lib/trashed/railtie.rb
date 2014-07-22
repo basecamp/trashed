@@ -16,7 +16,7 @@ module Trashed
 
       def call(env)
         @app.call(env).tap do
-          env['trashed.logger.tags'] = Rails.logger.formatter.current_tags.dup
+          env['trashed.logger.tags'] = Array(Thread.current[:activesupport_tagged_logging_tags]).dup
         end
       end
     end
