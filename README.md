@@ -92,6 +92,10 @@ YourNamespace.Hosts.host-001.Objects.T_STRING
 
 ### Version history
 
+*3.2.4* (July 25, 2014)
+
+* Fix compatibility with Rails 3.x tagged logging - @calavera
+
 *3.2.3* (June 23, 2014)
 
 * Report CPU/Idle time in tenths of a percent
