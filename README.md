@@ -45,7 +45,7 @@ allocated, etc.
 
 For example:
 ```ruby
-config.trashed.timing_dimensions = ->(env) do
+config.trashed.timing_dimensions = lambda do |env|
   # Rails 3 and 4 set this. Other Rack endpoints won't have it.
   if controller = env['action_controller.instance']
     name    = controller.controller_name
@@ -75,7 +75,7 @@ number of live String objects.
 For example:
 
 ```ruby
-config.trashed.gauge_dimensions = ->(env) {
+config.trashed.gauge_dimensions = lambda { |env|
   [ :All,
     :"Stage.#{Rails.env}",
     :"Hosts.#{`hostname -s`.chomp}" ]
