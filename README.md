@@ -92,6 +92,10 @@ YourNamespace.Hosts.host-001.Objects.T_STRING
 
 ### Version history
 
+*3.2.5* (Feb 26, 2014)
+
+* Support Ruby 2.2 GC.stat naming, avoiding 2.1 warnings
+
 *3.2.4* (July 25, 2014)
 
 * Fix compatibility with Rails 3.x tagged logging - @calavera
