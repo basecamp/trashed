@@ -92,7 +92,7 @@ YourNamespace.Hosts.host-001.Objects.T_STRING
 
 ### Version history
 
-*3.2.5* (Feb 26, 2014)
+*3.2.5* (Feb 26, 2015)
 
 * Support Ruby 2.2 GC.stat naming, avoiding 2.1 warnings
 
