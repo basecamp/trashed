@@ -28,8 +28,8 @@ module Trashed
       app.config.trashed.gauge_sample_rate ||= 0.05
       app.config.trashed.logger ||= Rails.logger
 
-      app.middleware.insert_after Rack::Runtime, Trashed::Rack, app.config.trashed
-      app.middleware.insert_after Rails::Rack::Logger, ExposeLoggerTagsToRackEnv
+      app.middleware.insert_after ::Rack::Runtime, Trashed::Rack, app.config.trashed
+      app.middleware.insert_after ::Rails::Rack::Logger, ExposeLoggerTagsToRackEnv
     end
   end
 end
