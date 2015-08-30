@@ -13,8 +13,8 @@ module Trashed
       @statsd = nil
       @timing_sample_rate = 0.1
       @gauge_sample_rate = 0.05
-      @timing_dimensions  = ->(env) { DEFAULT_DIMENSIONS }
-      @gauge_dimensions   = ->(env) { DEFAULT_DIMENSIONS }
+      @timing_dimensions  = lambda { |env| DEFAULT_DIMENSIONS }
+      @gauge_dimensions   = lambda { |env| DEFAULT_DIMENSIONS }
     end
 
     def report(env)

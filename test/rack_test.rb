@@ -21,7 +21,7 @@ class RackTest < Minitest::Test
   end
 
   def test_persistent_thread_state
-    app = ->(env) { env[Trashed::Rack::STATE][:persistent][:foo] = env[Trashed::Rack::STATE][:persistent][:foo].to_i + 1 }
+    app = lambda {|env| env[Trashed::Rack::STATE][:persistent][:foo] = env[Trashed::Rack::STATE][:persistent][:foo].to_i + 1 }
     rack = Trashed::Rack.new(app, @reporter)
 
     env = {}
