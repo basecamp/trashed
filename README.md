@@ -19,7 +19,8 @@ And in the body of your app config:
 
     module YourApp
       class Application < Rails::Application
-        config.trashed.statsd = YourApp.statsd
+        statsd = Trashed::Reporter::Statsd.new(YourApp.statsd)
+        config.trashed.add_reporter statsd
 
 
 ### Rails 2
@@ -27,9 +28,9 @@ And in the body of your app config:
 On Rails 2, add the middleware to `config/environment.rb`:
 
     Rails::Initializer.run do |config|
-      reporter = Trashed::Reporter.new
-      reporter.logger = Rails.logger
-      reporter.statsd = YourApp.statsd
+      reporter = Trashed::Reporter::Aggregator.new
+      reporter.add_reporter Trashed::Reporter::Logger.new(Rails.logger)
+      reporter.add_reporter Trashed::Reporter::Statsd.new(YourApp.statsd)
 
       config.middleware.use Trashed::Rack, reporter
     end
@@ -45,7 +46,8 @@ allocated, etc.
 
 For example:
 ```ruby
-config.trashed.timing_dimensions = ->(env) do
+statsd = Trashed::Reporter::Statsd.new(YourApp.statsd)
+statsd.timing_dimensions = ->(env) do
   # Rails 3, 4, and 5, set this. Other Rack endpoints won't have it.
   if controller = env['action_controller.instance']
     name    = controller.controller_name
@@ -58,6 +60,8 @@ config.trashed.timing_dimensions = ->(env) do
       :"Actions.#{name}.#{action}.#{format}+#{variant}" ]
   end
 end
+
+config.trashed.add_reporter statsd
 ```
 
 Results in metrics like:
@@ -75,11 +79,14 @@ number of live String objects.
 For example:
 
 ```ruby
-config.trashed.gauge_dimensions = ->(env) {
+statsd = Trashed::Reporter::Statsd.new(YourApp.statsd)
+statsd.gauge_dimensions = ->(env) {
   [ :All,
     :"Stage.#{Rails.env}",
     :"Hosts.#{`hostname -s`.chomp}" ]
 }
+
+config.trashed.add_reporter statsd
 ```
 
 Results in metrics like:
