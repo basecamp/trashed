@@ -4,14 +4,14 @@
 
  - Sends per-request object counts, heap growth, GC time, and more to StatsD.
  - Sends snapshots of resource usage, e.g. live String objects, to StatsD.
- - Supports new stuff: Rails 4.1 and latest Ruby 2.1 features.
- - Supports old stuff: Rails 2, Ruby 1.9+, REE, Ruby 1.8 with RubyBench patches.
+ - Supports new stuff: Rails 5.1 and latest Ruby 2.x features.
+ - Supports old stuff: Rails 2/3/4, Ruby 1.9+, REE, Ruby 1.8 with RubyBench patches.
 
 ## Setup
 
-### Rails 4
+### Rails 5
 
-On Rails 4 (and Rails 3), add this to the top of `config/application.rb`:
+On Rails 5 (and Rails 3 and 4), add this to the top of `config/application.rb`:
 
     require 'trashed/railtie'
 
@@ -46,7 +46,7 @@ allocated, etc.
 For example:
 ```ruby
 config.trashed.timing_dimensions = ->(env) do
-  # Rails 3 and 4 set this. Other Rack endpoints won't have it.
+  # Rails 3, 4, and 5, set this. Other Rack endpoints won't have it.
   if controller = env['action_controller.instance']
     name    = controller.controller_name
     action  = controller.action_name
@@ -91,6 +91,10 @@ YourNamespace.Hosts.host-001.Objects.T_STRING
 
 
 ### Version history
+
+*3.2.6* (June 21, 2017)
+
+* Mention Rails 5 support
 
 *3.2.5* (Feb 26, 2015)
 
