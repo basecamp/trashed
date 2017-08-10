@@ -3,17 +3,17 @@ require 'trashed/rack'
 module Trashed
   class Reporter
     attr_accessor :logger, :statsd
-    attr_accessor :timing_sample_rate, :gauge_sample_rate
-    attr_accessor :timing_dimensions, :gauge_dimensions
+    attr_accessor :counter_sample_rate, :gauge_sample_rate
+    attr_accessor :counter_dimensions, :gauge_dimensions
 
     DEFAULT_DIMENSIONS = [ :All ]
 
     def initialize
       @logger = nil
       @statsd = nil
-      @timing_sample_rate = 0.1
-      @gauge_sample_rate = 0.05
-      @timing_dimensions  = lambda { |env| DEFAULT_DIMENSIONS }
+      @counter_sample_rate = 1.0
+      @gauge_sample_rate = 1.0
+      @counter_dimensions  = lambda { |env| DEFAULT_DIMENSIONS }
       @gauge_dimensions   = lambda { |env| DEFAULT_DIMENSIONS }
     end
 
@@ -23,39 +23,39 @@ module Trashed
     end
 
     def report_logger(env)
-      timings = env[Trashed::Rack::TIMINGS]
+      counters = env[Trashed::COUNTERS]
       parts = []
 
-      elapsed = '%.2fms' % timings[:'Time.wall']
-      if timings[:'Time.pct.cpu']
-        elapsed << ' (%.1f%% cpu, %.1f%% idle)' % timings.values_at(:'Time.pct.cpu', :'Time.pct.idle')
+      elapsed = '%.2fms' % counters[:'Time.wall']
+      if counters[:'Time.pct.cpu']
+        elapsed << ' (%.1f%% cpu, %.1f%% idle)' % counters.values_at(:'Time.pct.cpu', :'Time.pct.idle')
       end
       parts << elapsed
 
-      obj = timings[:'GC.allocated_objects'].to_i
+      obj = counters[:'GC.allocated_objects'].to_i
       parts << '%d objects' % obj unless obj.zero?
 
-      if gcs = timings[:'GC.count'].to_i
+      if gcs = counters[:'GC.count'].to_i
         gc = '%d GCs' % gcs
         unless gcs.zero?
-          if timings.include?(:'GC.major_count')
-            gc << ' (%d major, %d minor)' % timings.values_at(:'GC.major_count', :'GC.minor_count').map(&:to_i)
+          if counters.include?(:'GC.major_count')
+            gc << ' (%d major, %d minor)' % counters.values_at(:'GC.major_count', :'GC.minor_count').map(&:to_i)
           end
-          if timings.include?(:'GC.time')
-            gc << ' took %.2fms' % timings[:'GC.time']
+          if counters.include?(:'GC.time')
+            gc << ' took %.2fms' % counters[:'GC.time']
           end
         end
         parts << gc
       end
 
-      oobgcs = timings[:'OOBGC.count'].to_i
+      oobgcs = counters[:'OOBGC.count'].to_i
       if !oobgcs.zero?
         oobgc = 'Avoided %d OOB GCs' % oobgcs
-        if timings[:'OOBGC.major_count']
-          oobgc << ' (%d major, %d minor, %d sweep)' % timings.values_at(:'OOBGC.major_count', :'OOBGC.minor_count', :'OOBGC.sweep_count').map(&:to_i)
+        if counters[:'OOBGC.major_count']
+          oobgc << ' (%d major, %d minor, %d sweep)' % counters.values_at(:'OOBGC.major_count', :'OOBGC.minor_count', :'OOBGC.sweep_count').map(&:to_i)
         end
-        if timings[:'OOBGC.time']
-          oobgc << ' saving %.2fms' % timings[:'OOBGC.time']
+        if counters[:'OOBGC.time']
+          oobgc << ' saving %.2fms' % counters[:'OOBGC.time']
         end
         parts << oobgc
       end
@@ -74,8 +74,10 @@ module Trashed
     def report_statsd(env)
       method = @statsd.respond_to?(:easy) ? :easy : :batch
       @statsd.send(method) do |statsd|
-        send_to_statsd statsd, :timing, @timing_sample_rate, env[Trashed::Rack::TIMINGS], :'Rack.Request', @timing_dimensions.call(env)
-        send_to_statsd statsd, :timing, @gauge_sample_rate,  env[Trashed::Rack::GAUGES],  :'Rack.Server',  @gauge_dimensions.call(env)
+        # We emit the counters as timings to take advantage of statsd
+        # aggregations, min, max, etc.
+        send_to_statsd statsd, :timing, @counter_sample_rate, env[Trashed::COUNTERS], :'Rack.Request', @counter_dimensions.call(env)
+        send_to_statsd statsd, :timing, @gauge_sample_rate, env[Trashed::GAUGES], :'Rack.Server', @gauge_dimensions.call(env)
       end
     end
 

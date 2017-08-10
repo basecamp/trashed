@@ -24,7 +24,7 @@ module Trashed
     initializer 'trashed' do |app|
       require 'statsd'
 
-      app.config.trashed.timing_sample_rate ||= 0.1
+      app.config.trashed.counter_sample_rate ||= 0.1
       app.config.trashed.gauge_sample_rate ||= 0.05
       app.config.trashed.logger ||= Rails.logger
 

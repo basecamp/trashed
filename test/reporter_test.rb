@@ -6,12 +6,12 @@ require 'stringio'
 class ReporterTest < Minitest::Test
   def setup
     @reporter = Trashed::Reporter.new
-    @reporter.timing_sample_rate = 1
+    @reporter.counter_sample_rate = 1
     @reporter.gauge_sample_rate = 1
   end
 
   def test_sample_rate_defaults
-    assert_equal 0.1, Trashed::Reporter.new.timing_sample_rate
+    assert_equal 0.1, Trashed::Reporter.new.counter_sample_rate
     assert_equal 0.05, Trashed::Reporter.new.gauge_sample_rate
   end
 
