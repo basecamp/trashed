@@ -23,6 +23,35 @@ module Trashed
     end
 
     def report_logger(env)
+    end
+
+    def report_statsd(env)
+    end
+
+    def send_to_statsd(statsd, method, sample_rate, measurements, namespace, dimensions)
+      measurements.each do |metric, value|
+        case value
+        when Array
+          value.each do |v|
+            send_to_statsd statsd, method, sample_rate, { metric => v }, namespace, dimensions
+          end
+        when Numeric
+          Array(dimensions || :All).each do |dimension|
+            statsd.send method, :"#{namespace}.#{dimension}.#{metric}", value, sample_rate
+          end
+        end
+      end
+    end
+  end
+
+  class RackReporter < Reporter
+    def initialize
+      super
+      @counter_sample_rate = 0.1
+      @gauge_sample_rate = 0.05
+    end
+
+    def report_logger(env)
       counters = env[Trashed::COUNTERS]
       parts = []
 
@@ -77,22 +106,17 @@ module Trashed
         # We emit the counters as timings to take advantage of statsd
         # aggregations, min, max, etc.
         send_to_statsd statsd, :timing, @counter_sample_rate, env[Trashed::COUNTERS], :'Rack.Request', @counter_dimensions.call(env)
-        send_to_statsd statsd, :timing, @gauge_sample_rate, env[Trashed::GAUGES], :'Rack.Server', @gauge_dimensions.call(env)
       end
     end
+  end
 
-    def send_to_statsd(statsd, method, sample_rate, measurements, namespace, dimensions)
-      measurements.each do |metric, value|
-        case value
-        when Array
-          value.each do |v|
-            send_to_statsd statsd, method, sample_rate, { metric => v }, namespace, dimensions
-          end
-        when Numeric
-          Array(dimensions || :All).each do |dimension|
-            statsd.send method, :"#{namespace}.#{dimension}.#{metric}", value, sample_rate
-          end
-        end
+  class PeriodicReporter < Reporter
+    def report_statsd(env)
+      puts "In report_statsd: #{statsd} v. #{@statsd}\n"
+      method = @statsd.respond_to?(:easy) ? :easy : :batch
+      @statsd.send(method) do |statsd|
+        send_to_statsd statsd, :count, @counter_sample_rate, env[Trashed::COUNTERS], :'Rack.Server', @counter_dimensions.call(env)
+        send_to_statsd @statsd, :gauge, @gauge_sample_rate, env[Trashed::GAUGES], :'Rack.Server', @gauge_dimensions.call(env)
       end
     end
   end
