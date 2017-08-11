@@ -5,14 +5,14 @@ require 'stringio'
 
 class ReporterTest < Minitest::Test
   def setup
-    @reporter = Trashed::Reporter.new
+    @reporter = Trashed::RackReporter.new
     @reporter.counter_sample_rate = 1
     @reporter.gauge_sample_rate = 1
   end
 
   def test_sample_rate_defaults
-    assert_equal 0.1, Trashed::Reporter.new.counter_sample_rate
-    assert_equal 0.05, Trashed::Reporter.new.gauge_sample_rate
+    assert_equal 0.1, Trashed::RackReporter.new.counter_sample_rate
+    assert_equal 0.05, Trashed::RackReporter.new.gauge_sample_rate
   end
 
   def test_report_logger
@@ -48,15 +48,16 @@ class ReporterTest < Minitest::Test
       def tagged(tags) @tags = tags; yield end
     end
 
-    @reporter.report_logger 'trashed.logger.tags' => %w(a b c), 'trashed.timings' => { :'Time.wall' => 1 }
+    @reporter.report_logger 'trashed.logger.tags' => %w(a b c), Trashed::COUNTERS => { :'Time.wall' => 1 }
     assert_match 'Rack handled in 1.00ms.', out.string
     assert_equal %w(a b c), logger.tags
   end
 
   private
-  def assert_report_logs(string, timings = {})
+  def assert_report_logs(string, counters = {})
     @reporter.logger = Logger.new(out = StringIO.new)
-    @reporter.report_logger 'trashed.timings' => timings.merge(:'Time.wall' => 1)
+    @reporter.report_logger Trashed::COUNTERS => counters.merge(:'Time.wall' => 1)
     assert_match string, out.string
   end
 end
+
