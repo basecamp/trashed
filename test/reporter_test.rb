@@ -4,6 +4,23 @@ require 'logger'
 require 'stringio'
 
 class ReporterTest < Minitest::Test
+
+  def setup
+    @reporter = Trashed::Reporter.new
+  end
+
+  def test_report_raises
+    assert_raises do
+      @reporter.report_logger
+    end
+
+    assert_raises do
+      @reporter.report_statsd
+    end
+  end
+end
+
+class RackReporterTest < Minitest::Test
   def setup
     @reporter = Trashed::RackReporter.new
     @reporter.counter_sample_rate = 1
@@ -61,3 +78,13 @@ class ReporterTest < Minitest::Test
   end
 end
 
+class PeriodicReporterTest < Minitest::Test
+  def setup
+    @reporter = Trashed::PeriodicReporter.new
+  end
+
+  def test_sample_rate_defaults
+    assert_equal 1, Trashed::PeriodicReporter.new.counter_sample_rate
+    assert_equal 1, Trashed::PeriodicReporter.new.gauge_sample_rate
+  end
+end
