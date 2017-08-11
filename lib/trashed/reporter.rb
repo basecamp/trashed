@@ -23,9 +23,11 @@ module Trashed
     end
 
     def report_logger(env)
+      raise "must implement interface"
     end
 
     def report_statsd(env)
+      raise "must implement interface"
     end
 
     def send_to_statsd(statsd, method, sample_rate, measurements, namespace, dimensions)
@@ -111,6 +113,7 @@ module Trashed
   end
 
   class PeriodicReporter < Reporter
+
     def report_statsd(env)
       puts "In report_statsd: #{statsd} v. #{@statsd}\n"
       method = @statsd.respond_to?(:easy) ? :easy : :batch
