@@ -47,6 +47,7 @@ module Trashed
   end
 
   class RackReporter < Reporter
+
     def initialize
       super
       @counter_sample_rate = 0.1
@@ -115,11 +116,10 @@ module Trashed
   class PeriodicReporter < Reporter
 
     def report_statsd(env)
-      puts "In report_statsd: #{statsd} v. #{@statsd}\n"
       method = @statsd.respond_to?(:easy) ? :easy : :batch
       @statsd.send(method) do |statsd|
         send_to_statsd statsd, :count, @counter_sample_rate, env[Trashed::COUNTERS], :'Rack.Server', @counter_dimensions.call(env)
-        send_to_statsd @statsd, :gauge, @gauge_sample_rate, env[Trashed::GAUGES], :'Rack.Server', @gauge_dimensions.call(env)
+        send_to_statsd statsd, :gauge, @gauge_sample_rate, env[Trashed::GAUGES], :'Rack.Server', @gauge_dimensions.call(env)
       end
     end
   end
