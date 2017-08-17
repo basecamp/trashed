@@ -115,6 +115,9 @@ module Trashed
 
   class PeriodicReporter < Reporter
 
+    def report_logger(env)
+    end
+
     def report_statsd(env)
       method = @statsd.respond_to?(:easy) ? :easy : :batch
       @statsd.send(method) do |statsd|
