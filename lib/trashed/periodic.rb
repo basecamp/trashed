@@ -20,7 +20,6 @@ module Trashed
             }
 
             @meters.each do |meter|
-              puts "Meter #{meter}\n"
               meter.instrument! env[STATE], env[COUNTERS], env[GAUGES] do
               end
             end
