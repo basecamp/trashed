@@ -4,7 +4,6 @@ require 'logger'
 require 'stringio'
 
 class ReporterTest < Minitest::Test
-
   def setup
     @reporter = Trashed::Reporter.new
   end
@@ -79,6 +78,15 @@ class RackReporterTest < Minitest::Test
 end
 
 class PeriodicReporterTest < Minitest::Test
+  class Statsd
+    def initialize(batcher)
+      @batcher = batcher
+    end
+    def batch
+      yield @batcher
+    end
+  end
+
   def setup
     @reporter = Trashed::PeriodicReporter.new
   end
