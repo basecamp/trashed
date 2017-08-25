@@ -23,11 +23,11 @@ module Trashed
     end
 
     def report_logger(env)
-      raise "must implement interface"
+      raise NotImplementedError
     end
 
     def report_statsd(env)
-      raise "must implement interface"
+      raise NotImplementedError
     end
 
     def send_to_statsd(statsd, method, sample_rate, measurements, namespace, dimensions)
