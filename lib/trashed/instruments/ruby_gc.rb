@@ -1,7 +1,7 @@
 module Trashed
   module Instruments
     class RubyGC
-      def start(state, timings, gauges)
+      def start(state, counters, gauges)
         state[:ruby_gc] = GC.stat
       end
 
@@ -23,12 +23,12 @@ module Trashed
           :total_freed_objects => :'GC.freed_objects'
       end
 
-      def measure(state, timings, gauges)
+      def measure(state, counters, gauges)
         gc = GC.stat
         before = state[:ruby_gc]
 
         MEASUREMENTS.each do |stat, metric|
-          timings[metric] = gc[stat] - before[stat] if gc.include? stat
+          counters[metric] = gc[stat] - before[stat] if gc.include? stat
         end
 
         gauges.concat gc.map { |k, v| [ :"GC.#{k}", v ] }

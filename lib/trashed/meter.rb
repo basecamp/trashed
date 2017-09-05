@@ -3,7 +3,7 @@ module Trashed
     attr_reader :instruments
 
     def initialize
-      @timers = []
+      @counters = []
       @gauges = []
     end
 
@@ -21,17 +21,17 @@ module Trashed
 
     def instrument(instrument)
       if instrument.respond_to?(:start)
-        @timers << instrument
+        @counters << instrument
       else
         @gauges << instrument
       end
     end
 
-    def instrument!(state, timings, gauges)
-      @timers.each { |i| i.start state, timings, gauges }
+    def instrument!(state, counters, gauges)
+      @counters.each { |i| i.start state, counters,  gauges }
       yield.tap do
-        @timers.reverse_each { |i| i.measure state, timings, gauges }
-        @gauges.each { |i| i.measure state, timings, gauges }
+        @counters.reverse_each { |i| i.measure state, counters, gauges }
+        @gauges.each { |i| i.measure state, counters, gauges }
       end
     end
 
@@ -40,12 +40,12 @@ module Trashed
         @name, @probe = name, probe
       end
 
-      def start(state, timings, gauges)
+      def start(state, counters, gauges)
         state[@name] = @probe.call
       end
 
-      def measure(state, timings, gauges)
-        timings[@name] = @probe.call - state[@name]
+      def measure(state, counters, gauges)
+        counters[@name] = @probe.call - state[@name]
       end
     end
 
@@ -54,7 +54,7 @@ module Trashed
         @name, @probe = name, probe
       end
 
-      def measure(state, timings, gauges)
+      def measure(state, counters, gauges)
         gauges << [ @name, @probe.call ]
       end
     end

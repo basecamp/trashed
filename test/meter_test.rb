@@ -6,9 +6,9 @@ class MeterTest < Minitest::Test
     i = 0
     meter.counts(:foo) { i += 1 }
 
-    timings = {}
-    assert_equal :result, meter.instrument!({}, timings, []) { :result }
-    assert_equal 1, timings[:foo]
+    counters = {}
+    assert_equal :result, meter.instrument!({}, counters, []) { :result }
+    assert_equal 1, counters[:foo]
   end
 
   def test_gauges
@@ -22,17 +22,17 @@ class MeterTest < Minitest::Test
 
   def test_instruments
     i = Object.new
-    def i.start(state, timings, gauges) state[:foo] = 10 end
-    def i.measure(state, timings, gauges)
-      timings[:foo] = state.delete(:foo) - 2
+    def i.start(state, counters, gauges) state[:foo] = 10 end
+    def i.measure(state, counters, gauges)
+      counters[:foo] = state.delete(:foo) - 2
       gauges << [ :bar, 2 ]
     end
     meter = Trashed::Meter.new
     meter.instrument i
 
-    timings, gauges = {}, []
-    assert_equal :result, meter.instrument!({}, timings, gauges) { :result }
-    assert_equal 8, timings[:foo]
+    counters, gauges = {}, []
+    assert_equal :result, meter.instrument!({}, counters, gauges) { :result }
+    assert_equal 8, counters[:foo]
     assert_equal [[ :bar, 2 ]], gauges
   end
 end

@@ -1,8 +1,8 @@
 require 'trashed/resource_usage'
+require 'trashed/consts'
 
 module Trashed
   class Rack
-    STATE, TIMINGS, GAUGES = 'trashed.state', 'trashed.timings', 'trashed.gauges'
 
     def initialize(app, reporter, options = {})
       @reporter = reporter
@@ -12,7 +12,7 @@ module Trashed
 
     def call(env)
       env[STATE]   = { :persistent => persistent_thread_state }
-      env[TIMINGS] = {}
+      env[COUNTERS] = {}
       env[GAUGES]  = []
 
       @app.call(env).tap { @reporter.report env }
@@ -26,7 +26,7 @@ module Trashed
     def build_instrumented_app(app, meters)
       meters.inject app do |wrapped, meter|
         lambda do |env|
-          meter.instrument! env[STATE], env[TIMINGS], env[GAUGES] do
+          meter.instrument! env[STATE], env[COUNTERS], env[GAUGES] do
             wrapped.call env
           end
         end

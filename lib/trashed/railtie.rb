@@ -4,7 +4,8 @@ require 'trashed/reporter'
 
 module Trashed
   class Railtie < ::Rails::Railtie
-    config.trashed = Trashed::Reporter.new
+    config.trashed = Trashed::RackReporter.new
+    config.trashed_periodic = Trashed::PeriodicReporter.new
 
     # Middleware would like to emit tagged logs after Rails::Rack::Logger
     # pops its tags. Introduce this haxware to stash the tags in the Rack
@@ -24,12 +25,20 @@ module Trashed
     initializer 'trashed' do |app|
       require 'statsd'
 
-      app.config.trashed.timing_sample_rate ||= 0.1
+      app.config.trashed.counter_sample_rate ||= 0.1
       app.config.trashed.gauge_sample_rate ||= 0.05
       app.config.trashed.logger ||= Rails.logger
 
       app.middleware.insert_after ::Rack::Runtime, Trashed::Rack, app.config.trashed
       app.middleware.insert_after ::Rails::Rack::Logger, ExposeLoggerTagsToRackEnv
     end
+
+    initializer 'trashed.periodic' do |app|
+      require 'statsd'
+
+      app.config.trashed_periodic.logger ||= Rails.logger
+      Periodic.new config.trashed_periodic
+    end
+
   end
 end
