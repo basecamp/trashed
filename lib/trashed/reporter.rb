@@ -106,8 +106,10 @@ module Trashed
     def report_statsd(env)
       method = @statsd.respond_to?(:easy) ? :easy : :batch
       @statsd.send(method) do |statsd|
-        # We emit the counters as timings to take advantage of statsd
-        # aggregations, min, max, etc.
+        # In statsd terminology, counters are aggregated by summing all measurements for a given flush period. 
+        # Timers, on the other hand, get aggregated with statistical summary functions, like p95, p50, p99, min, max, etc.,
+        # which is more meaningful when thinking about per request metrics.
+        # Statsd provides more information on metric types here: https://github.com/etsy/statsd/blob/master/docs/metric_types.md
         send_to_statsd statsd, :timing, @counter_sample_rate, env[Trashed::COUNTERS], :'Rack.Request', @counter_dimensions.call(env)
       end
     end
