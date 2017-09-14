@@ -6,13 +6,29 @@ require 'stringio'
 class ReporterTest < Minitest::Test
   def setup
     @reporter = Trashed::Reporter.new
-    @reporter.timing_sample_rate = 1
+  end
+
+  def test_report_raises
+    assert_raises do
+      @reporter.report_logger
+    end
+
+    assert_raises do
+      @reporter.report_statsd
+    end
+  end
+end
+
+class RackReporterTest < Minitest::Test
+  def setup
+    @reporter = Trashed::RackReporter.new
+    @reporter.counter_sample_rate = 1
     @reporter.gauge_sample_rate = 1
   end
 
   def test_sample_rate_defaults
-    assert_equal 0.1, Trashed::Reporter.new.timing_sample_rate
-    assert_equal 0.05, Trashed::Reporter.new.gauge_sample_rate
+    assert_equal 0.1, Trashed::RackReporter.new.counter_sample_rate
+    assert_equal 0.05, Trashed::RackReporter.new.gauge_sample_rate
   end
 
   def test_report_logger
@@ -48,15 +64,51 @@ class ReporterTest < Minitest::Test
       def tagged(tags) @tags = tags; yield end
     end
 
-    @reporter.report_logger 'trashed.logger.tags' => %w(a b c), 'trashed.timings' => { :'Time.wall' => 1 }
+    @reporter.report_logger 'trashed.logger.tags' => %w(a b c), Trashed::COUNTERS => { :'Time.wall' => 1 }
     assert_match 'Rack handled in 1.00ms.', out.string
     assert_equal %w(a b c), logger.tags
   end
 
   private
-  def assert_report_logs(string, timings = {})
+  def assert_report_logs(string, counters = {})
     @reporter.logger = Logger.new(out = StringIO.new)
-    @reporter.report_logger 'trashed.timings' => timings.merge(:'Time.wall' => 1)
+    @reporter.report_logger Trashed::COUNTERS => counters.merge(:'Time.wall' => 1)
     assert_match string, out.string
+  end
+end
+
+class PeriodicReporterTest < Minitest::Test
+  class Statsd
+    def initialize(batcher)
+      @batcher = batcher
+    end
+    def batch
+      yield @batcher
+    end
+  end
+
+  def setup
+    @reporter = Trashed::PeriodicReporter.new
+  end
+
+  def test_sample_rate_defaults
+    assert_equal 1, Trashed::PeriodicReporter.new.counter_sample_rate
+    assert_equal 1, Trashed::PeriodicReporter.new.gauge_sample_rate
+  end
+
+  def test_report_statsd
+    batch = MiniTest::Mock.new
+
+    batch.expect :count, true, [:'Rack.Server.All.GC.allocated_objects', 10, 1.0]
+    batch.expect :gauge, true, [:'Rack.Server.All.Time.pct.cpu', 9.1, 1.0]
+
+    statsd = Statsd.new batch
+
+    @reporter.statsd = statsd
+    @reporter.report_statsd \
+                Trashed::COUNTERS => { :'GC.allocated_objects' => 10 }, \
+                Trashed::GAUGES => { :'Time.pct.cpu' => 9.1 }
+
+    batch.verify
   end
 end

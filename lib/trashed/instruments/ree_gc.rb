@@ -5,7 +5,7 @@ module Trashed
         GC.enable_stats
       end
 
-      def start(state, timings, gauges)
+      def start(state, counters, gauges)
         state[:ruby18_gc] = {
           :objects   => ObjectSpace.allocated_objects,
           :gc_count  => GC.collections,
@@ -13,10 +13,10 @@ module Trashed
           :gc_memory => GC.allocated_size }
       end
 
-      def measure(state, timings, gauges)
+      def measure(state, counters, gauges)
         before = state[:ruby18_gc]
 
-        timings.update \
+        counters.update \
           :'GC.count'             => GC.collections - before[:gc_count],
           :'GC.time'              => GC.time - before[:gc_time],
           :'GC.memory'            => GC.allocated_size - before[:gc_memory],

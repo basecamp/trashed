@@ -36,5 +36,11 @@ module Trashed
       require 'trashed/instruments/gctools_oobgc'
       meter.instrument Trashed::Instruments::GctoolsOobgc.new
     end
+
+    # On Linux, track connections waiting to be accept(2)'d
+    if RUBY_PLATFORM.match(/linux/)
+      require 'trashed/instruments/backlog'
+      meter.instrument Trashed::Instruments::ListenBacklog.new(Process.pid)
+    end
   end
 end
