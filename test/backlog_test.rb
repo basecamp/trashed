@@ -29,8 +29,16 @@ class BacklogTest < Minitest::Test
   end
 
   def test_proc_tcp
-    tests = { Trashed::Instruments::TCP_LISTEN => 2,
-              Trashed::Instruments::TCP_ESTABLISHED => 7 }
+    # filter parsed file by each of these statuses, expecting N entries
+    # returned as a result
+    tests = {
+      Trashed::Instruments::TCP_LISTEN      => 2,
+      Trashed::Instruments::TCP_ESTABLISHED => 7,
+
+      # ensure we don't find what's not there
+      Trashed::Instruments::TCP_LAST_ACK    => 0,
+    }
+
     tests.each_pair do |st, expected|
       count = 0
       Trashed::Instruments::ProcTCP.new(tcp).by(:st => st) do |entry|
@@ -41,8 +49,16 @@ class BacklogTest < Minitest::Test
   end
 
   def test_proc_tcp6
-    tests = { Trashed::Instruments::TCP_LISTEN => 2,
-              Trashed::Instruments::TCP_ESTABLISHED => 1 }
+    # filter parsed file by each of these statuses, expecting N entries
+    # returned as a result
+    tests = {
+      Trashed::Instruments::TCP_LISTEN      => 2,
+      Trashed::Instruments::TCP_ESTABLISHED => 1,
+
+      # ensure we don't find what's not there
+      Trashed::Instruments::TCP_LAST_ACK    => 0,
+    }
+
     tests.each_pair do |st, expected|
       count = 0
       Trashed::Instruments::ProcTCP.new(tcp6).by(:st => st) do |entry|
