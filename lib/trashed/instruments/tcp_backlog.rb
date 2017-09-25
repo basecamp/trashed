@@ -25,7 +25,7 @@ module Trashed
         count = 0
 
         [:tcp, :tcp6].each do |name|
-          ProcTCP.new(File.open(File.join(@basefile, name.to_s)).by(st: TCP_SYN_RECV) do |entry|
+          ProcTCP.new(File.open(File.join(@basefile, name.to_s))).by(st: TCP_SYN_RECV) do |entry|
             count += 1
           end
         end

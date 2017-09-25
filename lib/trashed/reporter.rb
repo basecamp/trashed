@@ -1,5 +1,3 @@
-require 'trashed/rack'
-
 module Trashed
   class Reporter
     attr_accessor :logger, :statsd
@@ -18,16 +16,15 @@ module Trashed
     end
 
     def report(env)
-      report_logger env if @logger
       report_statsd env if @statsd
     end
 
-    def report_logger(env)
-      raise NotImplementedError
-    end
-
     def report_statsd(env)
-      raise NotImplementedError
+      method = @statsd.respond_to?(:easy) ? :easy : :batch
+      @statsd.send(method) do |statsd|
+        send_to_statsd statsd, :count, @counter_sample_rate, env[Trashed::COUNTERS], :'Rack.Server', @counter_dimensions.call(env)
+        send_to_statsd statsd, :gauge, @gauge_sample_rate, env[Trashed::GAUGES], :'Rack.Server', @gauge_dimensions.call(env)
+      end
     end
 
     def send_to_statsd(statsd, method, sample_rate, measurements, namespace, dimensions)
@@ -42,20 +39,6 @@ module Trashed
             statsd.send method, :"#{namespace}.#{dimension}.#{metric}", value, sample_rate
           end
         end
-      end
-    end
-  end
-
-  class PeriodicReporter < Reporter
-
-    def report_logger(env)
-    end
-
-    def report_statsd(env)
-      method = @statsd.respond_to?(:easy) ? :easy : :batch
-      @statsd.send(method) do |statsd|
-        send_to_statsd statsd, :count, @counter_sample_rate, env[Trashed::COUNTERS], :'Rack.Server', @counter_dimensions.call(env)
-        send_to_statsd statsd, :gauge, @gauge_sample_rate, env[Trashed::GAUGES], :'Rack.Server', @gauge_dimensions.call(env)
       end
     end
   end

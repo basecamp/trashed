@@ -3,7 +3,7 @@ require 'trashed/reporter'
 
 module Trashed
   class Railtie < ::Rails::Railtie
-    config.trashed = Trashed::PeriodicReporter.new
+    config.trashed = Trashed::Reporter.new
 
     initializer 'trashed' do |app|
       require 'statsd'

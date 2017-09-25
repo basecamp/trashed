@@ -1,7 +1,7 @@
 require 'trashed/test_helper'
-require 'trashed/instruments/backlog'
+require 'trashed/instruments/tcp_backlog'
 
-class BacklogTest < Minitest::Test
+class TCPBacklogTest < Minitest::Test
   def tcp
      StringIO.new(<<-HEREDOC
   sl  local_address rem_address   st tx_queue rx_queue tr tm->when retrnsmt   uid  timeout inode
