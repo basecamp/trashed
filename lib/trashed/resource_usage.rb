@@ -40,7 +40,7 @@ module Trashed
     # On Linux, track connections waiting to be accept(2)'d
     if RUBY_PLATFORM.match(/linux/)
       require 'trashed/instruments/tcp_backlog'
-      meter.instrument Trashed::Instruments::ListenBacklog.new(Process.pid)
+      meter.instrument Trashed::Instruments::ListenBacklog.new
     end
   end
 end
