@@ -30,7 +30,7 @@ module Trashed
           end
         end
 
-        gauges["TCP.syn_recv"] = count
+        gauges << [:'TCP.syn_recv', count]
       end
     end
 
