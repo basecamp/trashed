@@ -36,5 +36,6 @@ module Trashed
       require 'trashed/instruments/gctools_oobgc'
       meter.instrument Trashed::Instruments::GctoolsOobgc.new
     end
+
   end
 end
