@@ -1,4 +1,4 @@
-module Trashed
+module Barnes
   module Instruments
     class RubyGC
       def start(state, counters, gauges)

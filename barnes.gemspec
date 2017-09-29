@@ -1,13 +1,13 @@
 Gem::Specification.new do |s|
-  s.name      = 'trashed'
+  s.name      = 'barnes'
   s.version   = '3.2.6'
   s.license   = 'MIT'
-  s.summary   = 'Rack request GC stats => logs + StatsD'
-  s.description = 'Each Rack request eats up time, objects, and GC. Report usage to logs and StatsD.'
+  s.summary   = 'Ruby GC stats => StatsD'
+  s.description = 'Report GC usage data to StatsD.'
 
-  s.homepage  = 'https://github.com/basecamp/trashed'
-  s.author    = 'Jeremy Daer'
-  s.email     = 'jeremydaer@gmail.com'
+  s.homepage  = 'https://github.com/heroku/barnes'
+  s.author    = 'APG'
+  s.email     = 'agwozdziewycz@salesforce.com'
 
   s.add_runtime_dependency 'statsd-ruby', '~> 1.1'
 

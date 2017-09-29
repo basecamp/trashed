@@ -1,4 +1,4 @@
-module Trashed
+module Barnes
   module Instruments
     class Ruby18GC
       def initialize

@@ -1,11 +1,11 @@
-require 'trashed/test_helper'
-require 'trashed/instruments/ruby_gc_profiler'
+require 'barnes/test_helper'
+require 'barnes/instruments/ruby_gc_profiler'
 
 if defined? GC::Profiler
   class RubyGCProfilerTest < Minitest::Test
     def setup
       super
-      @instrument = Trashed::Instruments::RubyGCProfiler.new
+      @instrument = Barnes::Instruments::RubyGCProfiler.new
       GC::Profiler.enable
       GC::Profiler.clear
     end

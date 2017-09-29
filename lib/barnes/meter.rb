@@ -1,4 +1,4 @@
-module Trashed
+module Barnes
   class Meter
     attr_reader :instruments
 

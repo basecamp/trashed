@@ -1,4 +1,4 @@
-module Trashed
+module Barnes
   module Instruments
     # TODO: We probably want to report these as timers...
     #       At least from the per request basis.

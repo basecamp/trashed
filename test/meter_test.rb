@@ -1,8 +1,8 @@
-require 'trashed/test_helper'
+require 'barnes/test_helper'
 
 class MeterTest < Minitest::Test
   def test_counts
-    meter = Trashed::Meter.new
+    meter = Barnes::Meter.new
     i = 0
     meter.counts(:foo) { i += 1 }
 
@@ -12,7 +12,7 @@ class MeterTest < Minitest::Test
   end
 
   def test_gauges
-    meter = Trashed::Meter.new
+    meter = Barnes::Meter.new
     meter.gauges(:foo) { 1 }
 
     gauges = []
@@ -27,7 +27,7 @@ class MeterTest < Minitest::Test
       counters[:foo] = state.delete(:foo) - 2
       gauges << [ :bar, 2 ]
     end
-    meter = Trashed::Meter.new
+    meter = Barnes::Meter.new
     meter.instrument i
 
     counters, gauges = {}, []
