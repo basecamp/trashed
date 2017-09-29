@@ -1,5 +1,5 @@
-require 'trashed/test_helper'
-require 'trashed/reporter'
+require 'barnes/test_helper'
+require 'barnes/reporter'
 require 'logger'
 require 'stringio'
 
@@ -14,12 +14,12 @@ class ReporterTest < Minitest::Test
   end
 
   def setup
-    @reporter = Trashed::Reporter.new
+    @reporter = Barnes::Reporter.new
   end
 
   def test_sample_rate_defaults
-    assert_equal 1, Trashed::Reporter.new.counter_sample_rate
-    assert_equal 1, Trashed::Reporter.new.gauge_sample_rate
+    assert_equal 1, Barnes::Reporter.new.counter_sample_rate
+    assert_equal 1, Barnes::Reporter.new.gauge_sample_rate
   end
 
   def test_report_statsd
@@ -32,8 +32,8 @@ class ReporterTest < Minitest::Test
 
     @reporter.statsd = statsd
     @reporter.report_statsd \
-                Trashed::COUNTERS => { :'GC.allocated_objects' => 10 }, \
-                Trashed::GAUGES => { :'Time.pct.cpu' => 9.1 }
+                Barnes::COUNTERS => { :'GC.allocated_objects' => 10 }, \
+                Barnes::GAUGES => { :'Time.pct.cpu' => 9.1 }
 
     batch.verify
   end

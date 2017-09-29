@@ -1,4 +1,4 @@
-module Trashed
+module Barnes
   module Instruments
     # Tracks out of band GCs that occurred *since* the last request.
     class GctoolsOobgc

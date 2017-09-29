@@ -1,4 +1,4 @@
-module Trashed
+module Barnes
   class Reporter
     attr_accessor :logger, :statsd
     attr_accessor :counter_sample_rate, :gauge_sample_rate
@@ -22,8 +22,8 @@ module Trashed
     def report_statsd(env)
       method = @statsd.respond_to?(:easy) ? :easy : :batch
       @statsd.send(method) do |statsd|
-        send_to_statsd statsd, :count, @counter_sample_rate, env[Trashed::COUNTERS], :'Rack.Server', @counter_dimensions.call(env)
-        send_to_statsd statsd, :gauge, @gauge_sample_rate, env[Trashed::GAUGES], :'Rack.Server', @gauge_dimensions.call(env)
+        send_to_statsd statsd, :count, @counter_sample_rate, env[Barnes::COUNTERS], :'Rack.Server', @counter_dimensions.call(env)
+        send_to_statsd statsd, :gauge, @gauge_sample_rate, env[Barnes::GAUGES], :'Rack.Server', @gauge_dimensions.call(env)
       end
     end
 

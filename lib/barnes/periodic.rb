@@ -1,20 +1,20 @@
-require 'trashed/resource_usage'
-require 'trashed/consts'
+require 'barnes/resource_usage'
+require 'barnes/consts'
 
-module Trashed
+module Barnes
   class Periodic
     def initialize(reporter, interval = 10, options = {})
       @reporter = reporter
       @interval = interval
       @meters = Array(options.fetch(:meters, [ResourceUsage]))
       @thread = Thread.new {
-        Thread.current[:trashed_state] = {}
+        Thread.current[:barnes_state] = {}
         loop do
           begin
             sleep @interval
 
             env = {
-              STATE => { :persistent => Thread.current[:trashed_state] },
+              STATE => { :persistent => Thread.current[:barnes_state] },
               COUNTERS => {},
               GAUGES => []
             }

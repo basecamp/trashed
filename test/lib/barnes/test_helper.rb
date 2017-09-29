@@ -1,2 +1,2 @@
-require 'trashed'
+require 'barnes'
 require 'minitest/autorun'

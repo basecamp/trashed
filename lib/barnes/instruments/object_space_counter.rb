@@ -1,4 +1,4 @@
-module Trashed
+module Barnes
   module Instruments
     class ObjectSpaceCounter
       def measure(state, counters, gauges)

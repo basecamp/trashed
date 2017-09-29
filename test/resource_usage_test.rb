@@ -1,9 +1,9 @@
-require 'trashed/test_helper'
+require 'barnes/test_helper'
 
 class ResourceUsageTest < Minitest::Test
   def setup
     super
-    @meter = Trashed::ResourceUsage
+    @meter = Barnes::ResourceUsage
   end
 
   def test_wall_time

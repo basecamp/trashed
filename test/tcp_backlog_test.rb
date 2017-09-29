@@ -1,5 +1,5 @@
-require 'trashed/test_helper'
-require 'trashed/instruments/tcp_backlog'
+require 'barnes/test_helper'
+require 'barnes/instruments/tcp_backlog'
 
 class TCPBacklogTest < Minitest::Test
   def tcp
@@ -32,16 +32,16 @@ class TCPBacklogTest < Minitest::Test
     # filter parsed file by each of these statuses, expecting N entries
     # returned as a result
     tests = {
-      Trashed::Instruments::TCP_LISTEN      => 2,
-      Trashed::Instruments::TCP_ESTABLISHED => 7,
+      Barnes::Instruments::TCP_LISTEN      => 2,
+      Barnes::Instruments::TCP_ESTABLISHED => 7,
 
       # ensure we don't find what's not there
-      Trashed::Instruments::TCP_LAST_ACK    => 0,
+      Barnes::Instruments::TCP_LAST_ACK    => 0,
     }
 
     tests.each_pair do |st, expected|
       count = 0
-      Trashed::Instruments::ProcTCP.new(tcp).by(:st => st) do |entry|
+      Barnes::Instruments::ProcTCP.new(tcp).by(:st => st) do |entry|
         count += 1
       end
       assert_equal expected, count
@@ -52,16 +52,16 @@ class TCPBacklogTest < Minitest::Test
     # filter parsed file by each of these statuses, expecting N entries
     # returned as a result
     tests = {
-      Trashed::Instruments::TCP_LISTEN      => 2,
-      Trashed::Instruments::TCP_ESTABLISHED => 1,
+      Barnes::Instruments::TCP_LISTEN      => 2,
+      Barnes::Instruments::TCP_ESTABLISHED => 1,
 
       # ensure we don't find what's not there
-      Trashed::Instruments::TCP_LAST_ACK    => 0,
+      Barnes::Instruments::TCP_LAST_ACK    => 0,
     }
 
     tests.each_pair do |st, expected|
       count = 0
-      Trashed::Instruments::ProcTCP.new(tcp6).by(:st => st) do |entry|
+      Barnes::Instruments::ProcTCP.new(tcp6).by(:st => st) do |entry|
         count += 1
       end
       assert_equal expected, count
