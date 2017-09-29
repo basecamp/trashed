@@ -13,15 +13,6 @@ class ReporterTest < Minitest::Test
     end
   end
 
-  def setup
-    @reporter = Barnes::Reporter.new
-  end
-
-  def test_sample_rate_defaults
-    assert_equal 1, Barnes::Reporter.new.counter_sample_rate
-    assert_equal 1, Barnes::Reporter.new.gauge_sample_rate
-  end
-
   def test_report_statsd
     batch = MiniTest::Mock.new
 
@@ -30,8 +21,8 @@ class ReporterTest < Minitest::Test
 
     statsd = Statsd.new batch
 
-    @reporter.statsd = statsd
-    @reporter.report_statsd \
+    reporter = Barnes::Reporter.new(statsd, 1)
+    reporter.report_statsd \
                 Barnes::COUNTERS => { :'GC.allocated_objects' => 10 }, \
                 Barnes::GAUGES => { :'Time.pct.cpu' => 9.1 }
 

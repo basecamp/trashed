@@ -1,18 +1,10 @@
 module Barnes
   class Reporter
-    attr_accessor :logger, :statsd
-    attr_accessor :counter_sample_rate, :gauge_sample_rate
-    attr_accessor :counter_dimensions, :gauge_dimensions
+    attr_accessor :statsd, :sample_rate
 
-    DEFAULT_DIMENSIONS = [ :All ]
-
-    def initialize
-      @logger = nil
-      @statsd = nil
-      @counter_sample_rate = 1.0
-      @gauge_sample_rate = 1.0
-      @counter_dimensions  = lambda { |env| DEFAULT_DIMENSIONS }
-      @gauge_dimensions   = lambda { |env| DEFAULT_DIMENSIONS }
+    def initialize(statsd, sample_rate)
+      @statsd = statsd
+      @sample_rate = sample_rate
     end
 
     def report(env)
@@ -22,23 +14,14 @@ module Barnes
     def report_statsd(env)
       method = @statsd.respond_to?(:easy) ? :easy : :batch
       @statsd.send(method) do |statsd|
-        send_to_statsd statsd, :count, @counter_sample_rate, env[Barnes::COUNTERS], :'Rack.Server', @counter_dimensions.call(env)
-        send_to_statsd statsd, :gauge, @gauge_sample_rate, env[Barnes::GAUGES], :'Rack.Server', @gauge_dimensions.call(env)
+        send_to_statsd statsd, :count, @sample_rate, env[Barnes::COUNTERS], :'Rack.Server.All'
+        send_to_statsd statsd, :gauge, 1.0, env[Barnes::GAUGES], :'Rack.Server.All'
       end
     end
 
-    def send_to_statsd(statsd, method, sample_rate, measurements, namespace, dimensions)
+    def send_to_statsd(statsd, method, sample_rate, measurements, namespace)
       measurements.each do |metric, value|
-        case value
-        when Array
-          value.each do |v|
-            send_to_statsd statsd, method, sample_rate, { metric => v }, namespace, dimensions
-          end
-        when Numeric
-          Array(dimensions || :All).each do |dimension|
-            statsd.send method, :"#{namespace}.#{dimension}.#{metric}", value, sample_rate
-          end
-        end
+        statsd.send method, :"#{namespace}.#{metric}", value, sample_rate
       end
     end
   end

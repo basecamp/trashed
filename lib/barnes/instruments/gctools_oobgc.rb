@@ -2,25 +2,28 @@ module Barnes
   module Instruments
     # Tracks out of band GCs that occurred *since* the last request.
     class GctoolsOobgc
-      def start(state, counters, gauges)
-        last = state[:persistent][:oobgc] || Hash.new(0)
+      def start!(state)
+        state[:oobgc] = current
+      end
 
-        current = {
+      def instrument!(state, counters, gauges)
+        last = state[:oobgc]
+        cur = state[:oobgc] = current
+
+        counters.update \
+          :'OOBGC.count'        => cur[:count] - last[:count],
+          :'OOBGC.major_count'  => cur[:major] - last[:major],
+          :'OOBGC.minor_count'  => cur[:minor] - last[:minor],
+          :'OOBGC.sweep_count'  => cur[:sweep] - last[:sweep]
+      end
+
+      private def current
+        {
           :count => GC::OOB.stat(:count).to_i,
           :major => GC::OOB.stat(:major).to_i,
           :minor => GC::OOB.stat(:minor).to_i,
-          :sweep => GC::OOB.stat(:sweep).to_i }
-
-        counters.update \
-          :'OOBGC.count'        => current[:count] - last[:count],
-          :'OOBGC.major_count'  => current[:major] - last[:major],
-          :'OOBGC.minor_count'  => current[:minor] - last[:minor],
-          :'OOBGC.sweep_count'  => current[:sweep] - last[:sweep]
-
-        state[:persistent][:oobgc] = current
-      end
-
-      def measure(state, counters, gauges)
+          :sweep => GC::OOB.stat(:sweep).to_i
+        }
       end
     end
   end

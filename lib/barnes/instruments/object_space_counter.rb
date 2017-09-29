@@ -1,9 +1,9 @@
 module Barnes
   module Instruments
     class ObjectSpaceCounter
-      def measure(state, counters, gauges)
+      def instrument!(state, counters, gauges)
         ObjectSpace.count_objects.each do |type, count|
-          gauges << [ :"Objects.#{type}", count ]
+          gauges[:"Objects.#{type}"] = count
         end
       end
     end

@@ -1,37 +1,57 @@
 module Barnes
   module Instruments
     class RubyGC
-      def start(state, counters, gauges)
-        state[:ruby_gc] = GC.stat
-      end
-
-      MEASUREMENTS = {
+      COUNTERS = {
         :count => :'GC.count',
         :major_gc_count => :'GC.major_count',
         :minor_gc_count => :'GC.minor_gc_count' }
+
+      GAUGE_COUNTERS = {}
 
       # Detect Ruby 2.1 vs 2.2 GC.stat naming
       begin
         GC.stat :total_allocated_objects
       rescue ArgumentError
-        MEASUREMENTS.update \
+        GAUGE_COUNTERS.update \
           :total_allocated_object => :'GC.allocated_objects',
           :total_freed_object => :'GC.freed_objects'
       else
-        MEASUREMENTS.update \
+        GAUGE_COUNTERS.update \
           :total_allocated_objects => :'GC.allocated_objects',
           :total_freed_objects => :'GC.freed_objects'
       end
 
-      def measure(state, counters, gauges)
-        gc = GC.stat
-        before = state[:ruby_gc]
+      def initialize(sample_rate)
+        # see doc.gb for an explanation of sample_rate in this context.
+        @sample_rate = sample_rate
+      end
 
-        MEASUREMENTS.each do |stat, metric|
-          counters[metric] = gc[stat] - before[stat] if gc.include? stat
+      def start!(state)
+        state[:ruby_gc] = GC.stat
+      end
+
+      def instrument!(state, counters, gauges)
+        last = state[:ruby_gc]
+        cur = state[:ruby_gc] = GC.stat
+
+        COUNTERS.each do |stat, metric|
+          counters[metric] = cur[stat] - last[stat] if cur.include? stat
         end
 
-        gauges.concat gc.map { |k, v| [ :"GC.#{k}", v ] }
+        # special treatment gauges
+        GAUGE_COUNTERS.each do |stat, metric|
+          if cur.include? stat
+            val = cur[stat] - last[stat] if cur.include? stat
+            gauges[metric] = val * (1/@sample_rate)
+          end
+        end
+
+        # the rest of the gauges
+        cur.each do |k, v|
+          unless GAUGE_COUNTERS.include? k
+            gauges[:"GC.#{k}"] = v
+          end
+        end
       end
     end
   end
