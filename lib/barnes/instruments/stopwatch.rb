@@ -1,23 +1,22 @@
 module Barnes
   module Instruments
-    # TODO: We probably want to report these as timers...
-    #       At least from the per request basis.
     class Stopwatch
       def initialize(timepiece = Timepiece)
         @timepiece = timepiece
         @has_cpu_time = timepiece.respond_to?(:cpu)
       end
 
-      def start(state, counters, gauges)
-        state[:stopwatch_wall] = @timepiece.wall
-        state[:stopwatch_cpu]  = @timepiece.cpu if @has_cpu_time
+      def start!(state)
+        state[:stopwatch] = current
       end
 
-      def measure(state, counters, gauges)
-        wall_elapsed = @timepiece.wall - state.delete(:stopwatch_wall)
+      def instrument!(state, counters, gauges)
+        last = state[:stopwatch]
+        wall_elapsed = @timepiece.wall - last[:wall]
         counters[:'Time.wall'] = wall_elapsed
+
         if @has_cpu_time
-          cpu_elapsed = @timepiece.cpu - state.delete(:stopwatch_cpu)
+          cpu_elapsed = @timepiece.cpu - last[:cpu]
           idle_elapsed = wall_elapsed - cpu_elapsed
 
           counters[:'Time.cpu']      = cpu_elapsed
@@ -31,6 +30,16 @@ module Barnes
             counters[:'Time.pct.idle'] = 100.0 * idle_elapsed / wall_elapsed
           end
         end
+
+        state[:stopwatch] = current
+      end
+
+      private def current
+        state = {
+          :wall => @timepiece.wall,
+        }
+        state[:cpu]  = @timepiece.cpu if @has_cpu_time
+        state
       end
     end
 
