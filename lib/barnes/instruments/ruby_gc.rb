@@ -13,12 +13,12 @@ module Barnes
         GC.stat :total_allocated_objects
       rescue ArgumentError
         GAUGE_COUNTERS.update \
-          :total_allocated_object => :'GC.allocated_objects',
-          :total_freed_object => :'GC.freed_objects'
+          :total_allocated_object => :'GC.total_allocated_objects',
+          :total_freed_object => :'GC.total_freed_objects'
       else
         GAUGE_COUNTERS.update \
-          :total_allocated_objects => :'GC.allocated_objects',
-          :total_freed_objects => :'GC.freed_objects'
+          :total_allocated_objects => :'GC.total_allocated_objects',
+          :total_freed_objects => :'GC.total_freed_objects'
       end
 
       def initialize(sample_rate)
