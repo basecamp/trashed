@@ -15,6 +15,7 @@ module Barnes
       method = @statsd.respond_to?(:easy) ? :easy : :batch
       @statsd.send(method) do |statsd|
         send_to_statsd statsd, :count, @sample_rate, env[Barnes::COUNTERS], :'Rack.Server.All'
+        # for :gauge, use sample rate of 1, since gauges in statsd have no sampling characteristics.
         send_to_statsd statsd, :gauge, 1.0, env[Barnes::GAUGES], :'Rack.Server.All'
       end
     end
