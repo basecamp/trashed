@@ -4,7 +4,7 @@ module Barnes
 
     def initialize(statsd, sample_rate)
       @statsd = statsd
-      @sample_rate = sample_rate
+      @sample_rate = sample_rate.to_f
     end
 
     def report(env)

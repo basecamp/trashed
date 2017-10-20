@@ -22,7 +22,8 @@ module Barnes
     initializer 'barnes' do |app|
       require 'statsd'
 
-      sample_rate = config.barnes[:interval] / config.barnes[:aggregation_period]
+      sample_rate = config.barnes[:interval].to_f / config.barnes[:aggregation_period].to_f
+
       panels = config.barnes[:panels]
 
       if config.barnes[:statsd]
