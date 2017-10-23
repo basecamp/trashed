@@ -1,1 +1,1 @@
-require 'trashed'
+require 'barnes'

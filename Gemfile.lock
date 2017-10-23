@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    trashed (3.2.6)
+    barnes (0.0.1)
       statsd-ruby (~> 1.1)
 
 GEM
@@ -15,9 +15,9 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  barnes!
   minitest (~> 5.3)
   rake (~> 10)
-  trashed!
 
 BUNDLED WITH
-   1.15.1
+   1.15.4
