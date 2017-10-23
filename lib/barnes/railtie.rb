@@ -3,38 +3,24 @@ require 'barnes/reporter'
 require 'barnes/resource_usage'
 
 module Barnes
+  # Automatically configures barnes to run with
+  # rails 3, 4, and 5. Configuration can be changed
+  # in the application.rb. For example
+  #
+  #   module YourApp
+  #     class Application < Rails::Application
+  #     config.barnes[:interval] = 20
+  #
   class Railtie < ::Rails::Railtie
     config.barnes = {
-      # How often, in seconds, to instrument and report
-      :interval => 10,
-
-      # The minimal aggregation period in use, in seconds.
-      :aggregation_period => 60,
-
-      # The statsd reporter. This should be an instance of statsd-ruby
-      :statsd => nil,
-
-      # The instrumentation "panels" in use. See `resource_usage.rb` for
-      # an example panel, which is the default if none are provided.
-      :panels => [],
+      interval:           DEFAULT_INTERVAL,
+      aggregation_period: DEFAULT_AGGREGATION_PERIOD,
+      statsd:             DEFAULT_STATSD,
+      panels:             DEFAULT_PANELS,
     }
 
     initializer 'barnes' do |app|
-      require 'statsd'
-
-      sample_rate = config.barnes[:interval].to_f / config.barnes[:aggregation_period].to_f
-
-      panels = config.barnes[:panels]
-
-      if config.barnes[:statsd]
-        reporter = Barnes::Reporter.new(config.barnes[:statsd], sample_rate)
-
-        unless config.barnes[:panels].length > 0
-          panels << Barnes::ResourceUsage.new(sample_rate)
-        end
-
-        Periodic.new reporter, sample_rate, panels
-      end
+      Barnes.start(config.barnes)
     end
   end
 end

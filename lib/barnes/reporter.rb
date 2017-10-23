@@ -1,10 +1,23 @@
 module Barnes
+  # The reporter is used to send stats to the server.
+  #
+  # Example:
+  #
+  #   statsd   = Statsd.new('127.0.0.1', "8125")
+  #   reporter = Reporter.new(statsd: , sample_rate: 10)
+  #   reporter.report_statsd('barnes.counters' => {"hello" => 2})
   class Reporter
     attr_accessor :statsd, :sample_rate
 
-    def initialize(statsd, sample_rate)
-      @statsd = statsd
+    def initialize(statsd: , sample_rate:)
+      @statsd      = statsd
       @sample_rate = sample_rate.to_f
+
+      if @statsd.respond_to?(:easy)
+        @statsd_method = statsd.method(:easy)
+      else
+        @statsd_method = statsd.method(:batch)
+      end
     end
 
     def report(env)
@@ -12,17 +25,15 @@ module Barnes
     end
 
     def report_statsd(env)
-      method = @statsd.respond_to?(:easy) ? :easy : :batch
-      @statsd.send(method) do |statsd|
-        send_to_statsd statsd, :count, @sample_rate, env[Barnes::COUNTERS], :'Rack.Server.All'
-        # for :gauge, use sample rate of 1, since gauges in statsd have no sampling characteristics.
-        send_to_statsd statsd, :gauge, 1.0, env[Barnes::GAUGES], :'Rack.Server.All'
-      end
-    end
+      @statsd_method.call do |statsd|
+        env[Barnes::COUNTERS].each do |metric, value|
+          statsd.count(:"Rack.Server.All.#{metric}", value, @sample_rate)
+        end
 
-    def send_to_statsd(statsd, method, sample_rate, measurements, namespace)
-      measurements.each do |metric, value|
-        statsd.send method, :"#{namespace}.#{metric}", value, sample_rate
+        # for :gauge, use sample rate of 1, since gauges in statsd have no sampling characteristics.
+        env[Barnes::GAUGES].each do |metric, value|
+          statsd.gauge(:"Rack.Server.All.#{metric}", value, 1.0)
+        end
       end
     end
   end

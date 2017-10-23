@@ -1,8 +1,11 @@
 require 'barnes/consts'
 
 module Barnes
+  # The periodic class is used to send occasional metrics
+  # to a reporting instance of `Barnes::Reporter` at a semi-regular
+  # rate.
   class Periodic
-    def initialize(reporter, sample_rate = 1, panels = [])
+    def initialize(reporter:, sample_rate: 1, panels: [])
       @reporter = reporter
       @reporter.sample_rate = sample_rate
 
@@ -23,21 +26,19 @@ module Barnes
 
             # read the current values
             env = {
-              STATE => Thread.current[:barnes_state],
+              STATE    => Thread.current[:barnes_state],
               COUNTERS => {},
-              GAUGES => {}
+              GAUGES   => {}
             }
 
             @panels.each do |panel|
               panel.instrument! env[STATE], env[COUNTERS], env[GAUGES]
             end
             @reporter.report env
-          rescue => e
-            # TODO: do something better here...
-            puts e.backtrace.join "\n"
           end
         end
       }
+      @thread.abort_on_exception = true
     end
 
     def stop

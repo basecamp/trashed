@@ -21,7 +21,7 @@ class ReporterTest < Minitest::Test
 
     statsd = Statsd.new batch
 
-    reporter = Barnes::Reporter.new(statsd, 1)
+    reporter = Barnes::Reporter.new(statsd: statsd, sample_rate: 1)
     reporter.report_statsd \
                 Barnes::COUNTERS => { :'GC.allocated_objects' => 10 }, \
                 Barnes::GAUGES => { :'Time.pct.cpu' => 9.1 }
