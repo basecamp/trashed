@@ -92,6 +92,10 @@ YourNamespace.Hosts.host-001.Objects.T_STRING
 
 ### Version history
 
+*3.2.7* (November 8, 2017)
+
+* Ruby 1.8.7 compatibility
+
 *3.2.6* (June 21, 2017)
 
 * Mention Rails 5 support
