@@ -27,18 +27,20 @@ if defined? GC::Profiler
       GC.start
       GC.start
 
+      elapsed = GC::Profiler.total_time
+
       if GC::Profiler.respond_to? :raw_data
-        elapsed = GC::Profiler.raw_data.inject(0) { |sum, d| sum + d[:GC_TIME] }
         intervals = GC::Profiler.raw_data.map { |d| d[:GC_INVOKE_TIME] }
       end
 
       timings, gauges = {}, []
       @instrument.send method, nil, timings, gauges
 
-      assert_equal 2, timings[:"#{captured}.count"]
+      assert_equal 1000 * elapsed, timings[:"#{captured}.time"]
 
       if GC::Profiler.respond_to? :raw_data
-        assert_equal 1000 * elapsed, timings[:"#{captured}.time"]
+        assert_equal 2, timings[:"#{captured}.count"]
+
         assert_equal intervals.map { |i| 1000 * i }, timings[:'GC.interval']
       end
     end
