@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency 'statsd-ruby', '~> 1.1'
 
-  s.add_development_dependency 'rake', '~> 10'
+  s.add_development_dependency 'rake', '~> 12'
   s.add_development_dependency 'minitest', '~> 5.3'
 
   root = File.dirname(__FILE__)

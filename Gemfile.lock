@@ -8,7 +8,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     minitest (5.10.2)
-    rake (10.5.0)
+    rake (12.3.3)
     statsd-ruby (1.4.0)
 
 PLATFORMS
@@ -16,7 +16,7 @@ PLATFORMS
 
 DEPENDENCIES
   minitest (~> 5.3)
-  rake (~> 10)
+  rake (~> 12)
   trashed!
 
 BUNDLED WITH
