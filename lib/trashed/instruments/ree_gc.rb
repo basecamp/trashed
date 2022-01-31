@@ -18,7 +18,7 @@ module Trashed
 
         timings.update \
           :'GC.count'             => GC.collections - before[:gc_count],
-          :'GC.time'              => GC.time - before[:gc_time],
+          :'GC.time'              => (GC.time - before[:gc_time]) / 1000.0,
           :'GC.memory'            => GC.allocated_size - before[:gc_memory],
           :'GC.allocated_objects' => ObjectSpace.allocated_objects - before[:objects]
 
